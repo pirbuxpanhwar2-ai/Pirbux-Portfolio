@@ -37,24 +37,28 @@ export function loadPortfolioState(): PortfolioState {
 
     // Ensure experiences have both the merged Khoj card and the Waiter to Manager Marhaba card
     const hasUpdatedMarhaba = Array.isArray(parsed.experience) && parsed.experience.some(
-      (e: any) => e.role?.toLowerCase().includes('waiter') || e.details?.toLowerCase().includes('humble waiter')
+      (e: any) => e && (e.role?.toLowerCase?.().includes('waiter') || e.details?.toLowerCase?.().includes('humble waiter'))
     );
     const hasMergedKhoj = Array.isArray(parsed.experience) && parsed.experience.some(
-      (e: any) => Array.isArray(e.bullets) && e.bullets.length > 0
+      (e: any) => e && Array.isArray(e.bullets) && e.bullets.length > 0
     );
     const isExperienceUpToDate = hasMergedKhoj && hasUpdatedMarhaba;
 
     // Purge any mock/sample data from inbox, files, and analytics
     const hasMockInbox = Array.isArray(parsed.inbox) && parsed.inbox.some(
-      (m: any) => m.id === 'inb-1' || m.email?.includes('tariq.dining') || m.email?.includes('flavorshospitality')
+      (m: any) => m && (m.id === 'inb-1' || m.email?.includes('tariq.dining') || m.email?.includes('flavorshospitality'))
     );
     const hasMockFiles = Array.isArray(parsed.files) && parsed.files.some(
-      (f: any) => f.id === 'file-1' || f.id === 'file-2'
+      (f: any) => f && (f.id === 'file-1' || f.id === 'file-2')
     );
     const hasMockAnalytics =
       (parsed.analytics?.summary?.totalPageViews ?? 0) >= 1000 ||
       (Array.isArray(parsed.analytics?.dailyTraffic) &&
-        parsed.analytics?.dailyTraffic.some((d: any) => d.date === '2026-10-20'));
+        parsed.analytics?.dailyTraffic.some((d: any) => d && d.date === '2026-10-20'));
+
+    const heroSlides = Array.isArray(parsed.hero?.slides) && parsed.hero.slides.length > 0
+      ? parsed.hero.slides
+      : initialPortfolioData.hero.slides;
 
     return {
       ...initialPortfolioData,
@@ -62,7 +66,12 @@ export function loadPortfolioState(): PortfolioState {
       experience: isExperienceUpToDate ? parsed.experience : initialPortfolioData.experience,
       journey: isExperienceUpToDate ? (parsed.journey || initialPortfolioData.journey) : initialPortfolioData.journey,
       about: (parsed.about && parsed.about.heading) ? parsed.about : initialPortfolioData.about,
-      skills: (parsed.skills && parsed.skills.length) ? parsed.skills : initialPortfolioData.skills,
+      skills: (Array.isArray(parsed.skills) && parsed.skills.length > 0) ? parsed.skills : initialPortfolioData.skills,
+      whyCards: (Array.isArray(parsed.whyCards) && parsed.whyCards.length > 0) ? parsed.whyCards : initialPortfolioData.whyCards,
+      services: (Array.isArray(parsed.services) && parsed.services.length > 0) ? parsed.services : initialPortfolioData.services,
+      certificates: (Array.isArray(parsed.certificates) && parsed.certificates.length > 0) ? parsed.certificates : initialPortfolioData.certificates,
+      recommendations: (Array.isArray(parsed.recommendations) && parsed.recommendations.length > 0) ? parsed.recommendations : initialPortfolioData.recommendations,
+      education: (Array.isArray(parsed.education) && parsed.education.length > 0) ? parsed.education : initialPortfolioData.education,
       files: hasMockFiles ? [] : (Array.isArray(parsed.files) ? parsed.files : []),
       inbox: hasMockInbox ? [] : (Array.isArray(parsed.inbox) ? parsed.inbox : []),
       analytics: hasMockAnalytics
@@ -75,8 +84,12 @@ export function loadPortfolioState(): PortfolioState {
               ...(parsed.analytics?.summary || {})
             }
           },
-      hero: { ...initialPortfolioData.hero, ...parsed.hero },
-      contact: { ...initialPortfolioData.contact, ...parsed.contact },
+      hero: {
+        ...initialPortfolioData.hero,
+        ...(parsed.hero || {}),
+        slides: heroSlides
+      },
+      contact: { ...initialPortfolioData.contact, ...(parsed.contact || {}) },
       credentials: {
         ...initialPortfolioData.credentials,
         username: loadedUsername,
