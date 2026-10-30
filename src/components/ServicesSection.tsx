@@ -87,26 +87,26 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   };
 
   return (
-    <section id="services" className="py-20 relative">
+    <section id="services" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit Services
         </button>
       )}
 
       <div className="max-w-[1080px] mx-auto px-5">
-        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-2">
+        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-1.5">
           Excel, Dashboards &amp; <span className="text-[#19e05f]">Office Documents</span>
         </h2>
-        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-2xl mx-auto mb-6 sm:mb-8 leading-normal">
           I transform raw data into meaningful insights, create professional Excel spreadsheets, design interactive KPI dashboards, prepare staff duty rosters, and develop well-structured budget sheets.
         </p>
 
         {/* 6 Services Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {services.map((svc) => {
             const prompt =
               currentLang === 'ur'
@@ -116,12 +116,12 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             return (
               <article
                 key={svc.id}
-                className="p-6 rounded-3xl bg-gradient-to-br from-[#0f1d15] to-[#060d09] border border-[#16271c] hover:border-[#1d5a35] transition-all flex flex-col justify-between group hover:-translate-y-1 shadow-lg"
+                className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#0f1d15] to-[#060d09] border border-[#16271c] hover:border-[#1d5a35] transition-all flex flex-col justify-between group hover:-translate-y-1 shadow-lg"
               >
                 <div>
                   {getServiceIcon(svc.icon)}
-                  <h3 className="text-lg font-medium text-white mb-2">{svc.title}</h3>
-                  <p className="text-xs text-[#9aaaa0] leading-relaxed mb-6">{svc.description}</p>
+                  <h3 className="text-lg font-medium text-white mb-1.5">{svc.title}</h3>
+                  <p className="text-xs text-[#9aaaa0] leading-normal mb-3">{svc.description}</p>
                 </div>
 
                 <a
@@ -140,7 +140,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         </div>
 
         {/* Business Mission Quote */}
-        <blockquote className="max-w-2xl mx-auto my-14 text-center text-sm sm:text-base leading-relaxed text-[#f2f7f4] p-6 sm:p-8 border border-[#1d5a35] rounded-3xl bg-[radial-gradient(circle_at_50%_120%,#19e05f22,transparent_70%)] shadow-xl">
+        <blockquote className="max-w-2xl mx-auto my-8 sm:my-10 text-center text-sm sm:text-base leading-normal sm:leading-relaxed text-[#f2f7f4] p-5 sm:p-6 border border-[#1d5a35] rounded-3xl bg-[radial-gradient(circle_at_50%_120%,#19e05f22,transparent_70%)] shadow-xl">
           &quot;My goal is to help businesses improve productivity, simplify reporting, and make better decisions through organized data, smart formulas, and professional document design.&quot;
         </blockquote>
 

@@ -16,26 +16,26 @@ export const CertificatesSection: React.FC<CertificatesSectionProps> = ({
   onQuickEdit
 }) => {
   return (
-    <section id="certificates" className="py-20 relative">
+    <section id="certificates" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit Certificates
         </button>
       )}
 
       <div className="max-w-[1080px] mx-auto px-5">
-        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-2">
+        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-1.5">
           Certificates &amp; <span className="text-[#19e05f]">Awards</span>
         </h2>
-        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-10">
+        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-6 sm:mb-8 leading-normal">
           Recognition from my workplace and courses I’ve completed. Tap a certificate to see it larger.
         </p>
 
         {/* Certificate Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {certificates.map((cert) => (
             <article
               key={cert.id}

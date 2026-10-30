@@ -31,19 +31,22 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
 
   const { summary, dailyTraffic, sources, devices, locations, actions, recentActivity } = analytics;
 
-  // Multiplier for mock filtering
-  const multiplier = timeRange === 'today' ? 0.2 : timeRange === '30d' ? 3.4 : timeRange === 'all' ? 8.2 : 1;
-  const displayViews = Math.round(summary.totalPageViews * multiplier);
-  const displayVisitors = Math.round(summary.uniqueVisitors * multiplier);
-  const displayEngagement = Math.round(summary.engagementActions * multiplier);
-  const displayWhatsapp = Math.round(summary.whatsappInquiries * multiplier);
-  const displayDownloads = Math.round(summary.downloads * multiplier);
+  // Real analytics metrics (no mock multipliers)
+  const displayViews = summary.totalPageViews;
+  const displayVisitors = summary.uniqueVisitors;
+  const displayEngagement = summary.engagementActions;
+  const displayWhatsapp = summary.whatsappInquiries;
+  const displayDownloads = summary.downloads;
 
-  const maxTrafficVal = Math.max(
-    ...dailyTraffic.map((d) =>
-      selectedMetric === 'views' ? d.pageViews : selectedMetric === 'visitors' ? d.uniqueVisitors : d.engagement
-    )
-  );
+  const maxTrafficVal =
+    dailyTraffic.length > 0
+      ? Math.max(
+          ...dailyTraffic.map((d) =>
+            selectedMetric === 'views' ? d.pageViews : selectedMetric === 'visitors' ? d.uniqueVisitors : d.engagement
+          ),
+          1
+        )
+      : 1;
 
   return (
     <div className="space-y-6 text-[#f2f7f4]">
@@ -106,9 +109,8 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {displayViews.toLocaleString()}
             </span>
-            <span className="text-[11px] text-[#19e05f] font-semibold flex items-center gap-0.5">
-              <TrendingUp className="w-3 h-3" />
-              +18.4%
+            <span className="text-[11px] text-gray-400 font-medium">
+              {displayViews > 0 ? 'Live Tracking' : 'Active'}
             </span>
           </div>
           <p className="text-[11px] text-[#9aaaa0] mt-1">Across all devices and sources</p>
@@ -126,12 +128,11 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {displayVisitors.toLocaleString()}
             </span>
-            <span className="text-[11px] text-[#19e05f] font-semibold flex items-center gap-0.5">
-              <TrendingUp className="w-3 h-3" />
-              +12.6%
+            <span className="text-[11px] text-gray-400 font-medium">
+              {displayVisitors > 0 ? 'Live Tracking' : 'Active'}
             </span>
           </div>
-          <p className="text-[11px] text-[#9aaaa0] mt-1">Individual hiring managers &amp; peers</p>
+          <p className="text-[11px] text-[#9aaaa0] mt-1">Hiring managers &amp; peers</p>
         </div>
 
         {/* Card 3: WhatsApp Inquiries */}
@@ -146,9 +147,8 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <span className="text-2xl sm:text-3xl font-bold text-[#19e05f] tracking-tight">
               {displayWhatsapp.toLocaleString()}
             </span>
-            <span className="text-[11px] text-[#19e05f] font-semibold flex items-center gap-0.5">
-              <TrendingUp className="w-3 h-3" />
-              +24.1%
+            <span className="text-[11px] text-gray-400 font-medium">
+              {displayWhatsapp > 0 ? 'Active' : 'Ready'}
             </span>
           </div>
           <p className="text-[11px] text-[#9aaaa0] mt-1">Direct recruitment chats initiated</p>
@@ -166,12 +166,11 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {displayDownloads.toLocaleString()}
             </span>
-            <span className="text-[11px] text-[#19e05f] font-semibold flex items-center gap-0.5">
-              <CheckCircle2 className="w-3 h-3" />
-              High intent
+            <span className="text-[11px] text-gray-400 font-medium">
+              {displayDownloads > 0 ? 'Active' : 'Ready'}
             </span>
           </div>
-          <p className="text-[11px] text-[#9aaaa0] mt-1">Resumes and Excel samples downloaded</p>
+          <p className="text-[11px] text-[#9aaaa0] mt-1">Resumes and files downloaded</p>
         </div>
       </div>
 
@@ -201,39 +200,48 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
         </div>
 
         {/* Bar chart visualization */}
-        <div className="h-44 sm:h-52 flex items-end gap-2 sm:gap-4 pt-6 pb-2 border-b border-[#16271c]">
-          {dailyTraffic.map((point, idx) => {
-            const val =
-              selectedMetric === 'views'
-                ? point.pageViews
-                : selectedMetric === 'visitors'
-                ? point.uniqueVisitors
-                : point.engagement;
-            const pct = Math.max(12, Math.round((val / maxTrafficVal) * 100));
-            return (
-              <div key={idx} className="flex-1 flex flex-col items-center justify-end h-full group relative">
-                {/* Tooltip */}
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-[#050e09] border border-[#19e05f]/40 text-white text-[11px] font-medium py-1 px-2 rounded-lg pointer-events-none whitespace-nowrap z-10 shadow-lg">
-                  {val.toLocaleString()} {selectedMetric}
-                </div>
-                {/* Bar */}
-                <div
-                  style={{ height: `${pct}%` }}
-                  className="w-full max-w-[48px] rounded-t-lg bg-gradient-to-t from-[#0e5c2b] to-[#19e05f] hover:brightness-125 transition-all shadow-sm group-hover:shadow-[#19e05f55]"
-                />
-              </div>
-            );
-          })}
-        </div>
-        {/* Day labels */}
-        <div className="flex justify-between gap-2 sm:gap-4 mt-2 text-center text-xs text-[#9aaaa0]">
-          {dailyTraffic.map((point, idx) => (
-            <div key={idx} className="flex-1">
-              <span className="font-medium text-gray-300">{point.day}</span>
-              <span className="block text-[10px] text-gray-500">{point.date.slice(5)}</span>
+        {dailyTraffic.length === 0 ? (
+          <div className="h-44 sm:h-52 flex flex-col items-center justify-center text-center text-gray-500 text-xs border-b border-[#16271c] py-6">
+            <Activity className="w-8 h-8 text-gray-600 mb-2" />
+            <p className="text-gray-300 font-medium">No visitor traffic recorded yet</p>
+            <p className="text-[11px] text-gray-500 max-w-sm mt-1">
+              Your portfolio is clean and ready. Once you publish and share your link, real daily traffic charts will display here.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="h-44 sm:h-52 flex items-end gap-2 sm:gap-4 pt-6 pb-2 border-b border-[#16271c]">
+              {dailyTraffic.map((point, idx) => {
+                const val =
+                  selectedMetric === 'views'
+                    ? point.pageViews
+                    : selectedMetric === 'visitors'
+                    ? point.uniqueVisitors
+                    : point.engagement;
+                const pct = Math.max(12, Math.round((val / maxTrafficVal) * 100));
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center justify-end h-full group relative">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-[#050e09] border border-[#19e05f]/40 text-white text-[11px] font-medium py-1 px-2 rounded-lg pointer-events-none whitespace-nowrap z-10 shadow-lg">
+                      {val.toLocaleString()} {selectedMetric}
+                    </div>
+                    <div
+                      style={{ height: `${pct}%` }}
+                      className="w-full max-w-[48px] rounded-t-lg bg-gradient-to-t from-[#0e5c2b] to-[#19e05f] hover:brightness-125 transition-all shadow-sm group-hover:shadow-[#19e05f55]"
+                    />
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+            <div className="flex justify-between gap-2 sm:gap-4 mt-2 text-center text-xs text-[#9aaaa0]">
+              {dailyTraffic.map((point, idx) => (
+                <div key={idx} className="flex-1">
+                  <span className="font-medium text-gray-300">{point.day}</span>
+                  <span className="block text-[10px] text-gray-500">{point.date.slice(5)}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Grid: Traffic Sources & User Engagement Breakdown */}
@@ -242,27 +250,33 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
         <div className="p-5 rounded-2xl bg-[#09150d] border border-[#16271c]">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold text-white text-sm">Traffic Acquisition Channels</h4>
-            <span className="text-xs text-[#9aaaa0]">Where visitors discover Pir Bux</span>
+            <span className="text-xs text-[#9aaaa0]">Traffic origins</span>
           </div>
 
-          <div className="space-y-3">
-            {sources.map((src, i) => (
-              <div key={i} className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-300 font-medium">{src.name}</span>
-                  <span className="text-white font-semibold">
-                    {src.percentage}% <span className="text-gray-500 font-normal">({src.count})</span>
-                  </span>
+          {sources.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 text-xs bg-[#050e09] rounded-xl border border-[#16271c]">
+              No referral sources logged yet. Channels (WhatsApp, LinkedIn, Search, Direct) will log automatically as people visit.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {sources.map((src, i) => (
+                <div key={i} className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-300 font-medium">{src.name}</span>
+                    <span className="text-white font-semibold">
+                      {src.percentage}% <span className="text-gray-500 font-normal">({src.count})</span>
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[#050e09] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{ width: `${src.percentage}%`, backgroundColor: src.color }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full h-2 rounded-full bg-[#050e09] overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${src.percentage}%`, backgroundColor: src.color }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Engagement Actions Breakdown */}
@@ -272,22 +286,28 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <span className="text-xs text-[#9aaaa0]">Recruiter actions taken</span>
           </div>
 
-          <div className="space-y-2.5">
-            {actions.map((act, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-[#050e09] border border-[#16271c] text-xs hover:border-[#1d5a35] transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#19e05f]" />
-                  <span className="text-gray-200">{act.action}</span>
+          {actions.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 text-xs bg-[#050e09] rounded-xl border border-[#16271c]">
+              No visitor events recorded yet. Button clicks, CV downloads, and WhatsApp queries will show here.
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {actions.map((act, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-[#050e09] border border-[#16271c] text-xs hover:border-[#1d5a35] transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#19e05f]" />
+                    <span className="text-gray-200">{act.action}</span>
+                  </div>
+                  <span className="font-semibold text-[#19e05f] bg-[#19e05f]/10 px-2 py-0.5 rounded-md">
+                    {act.count} times
+                  </span>
                 </div>
-                <span className="font-semibold text-[#19e05f] bg-[#19e05f]/10 px-2 py-0.5 rounded-md">
-                  {act.count} times
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -300,20 +320,26 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <h4 className="font-semibold text-white text-sm">Top Visitor Locations</h4>
           </div>
 
-          <div className="space-y-2.5">
-            {locations.map((loc, i) => (
-              <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[#14231a] last:border-0">
-                <div>
-                  <span className="text-white font-medium">{loc.city}</span>
-                  <span className="text-gray-500 text-[11px] ml-1.5">{loc.country}</span>
+          {locations.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 text-xs bg-[#050e09] rounded-xl border border-[#16271c]">
+              Geographic visitor demographics will be displayed once visitors access your live portfolio.
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {locations.map((loc, i) => (
+                <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[#14231a] last:border-0">
+                  <div>
+                    <span className="text-white font-medium">{loc.city}</span>
+                    <span className="text-gray-500 text-[11px] ml-1.5">{loc.country}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400">{loc.count} visits</span>
+                    <span className="font-semibold text-white w-10 text-right">{loc.percentage}%</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">{loc.count} visits</span>
-                  <span className="font-semibold text-white w-10 text-right">{loc.percentage}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Devices Breakdown */}
@@ -323,21 +349,29 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <h4 className="font-semibold text-white text-sm">Device &amp; Platform Breakdown</h4>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-4 text-center">
-            {devices.map((dev, i) => (
-              <div key={i} className="p-3 rounded-xl bg-[#050e09] border border-[#16271c]">
-                <span className="block text-xl font-bold text-white">{dev.percentage}%</span>
-                <span className="text-xs text-[#9aaaa0]">{dev.device}</span>
-                <span className="block text-[10px] text-gray-500 mt-1">{dev.count} sessions</span>
+          {devices.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 text-xs bg-[#050e09] rounded-xl border border-[#16271c]">
+              Device and browser platform distribution will be reported as visitors browse your site.
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-3 gap-3 mb-4 text-center">
+                {devices.map((dev, i) => (
+                  <div key={i} className="p-3 rounded-xl bg-[#050e09] border border-[#16271c]">
+                    <span className="block text-xl font-bold text-white">{dev.percentage}%</span>
+                    <span className="text-xs text-[#9aaaa0]">{dev.device}</span>
+                    <span className="block text-[10px] text-gray-500 mt-1">{dev.count} sessions</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="p-3 bg-[#050e09] rounded-xl border border-[#16271c] text-xs text-[#9aaaa0]">
-            <p>
-              💡 <span className="text-white font-medium">Insights:</span> 67% of visitors browse on mobile devices (primarily via WhatsApp and LinkedIn links). Portfolio mobile-responsiveness is performing optimally.
-            </p>
-          </div>
+              <div className="p-3 bg-[#050e09] rounded-xl border border-[#16271c] text-xs text-[#9aaaa0]">
+                <p>
+                  💡 <span className="text-white font-medium">Insights:</span> Portfolio is optimized for mobile, tablet, and desktop viewing.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -348,26 +382,32 @@ export const AnalyticsDashboardTab: React.FC<AnalyticsDashboardTabProps> = ({
             <Activity className="w-4 h-4 text-[#19e05f]" />
             <h4 className="font-semibold text-white text-sm">Real-time Visitor Activity Log</h4>
           </div>
-          <span className="text-xs text-[#9aaaa0]">Recent page events</span>
+          <span className="text-xs text-[#9aaaa0]">Live page events</span>
         </div>
 
-        <div className="space-y-2">
-          {recentActivity.slice(0, 8).map((act) => (
-            <div
-              key={act.id}
-              className="flex items-start justify-between gap-3 p-3 rounded-xl bg-[#050e09] border border-[#16271c] text-xs"
-            >
-              <div className="flex items-start gap-2.5">
-                <span className="mt-0.5 w-2 h-2 rounded-full bg-[#19e05f] shrink-0" />
-                <div>
-                  <span className="font-semibold text-white mr-2">{act.action}</span>
-                  <span className="text-[#9aaaa0]">{act.details}</span>
+        {recentActivity.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 text-xs bg-[#050e09] rounded-xl border border-[#16271c]">
+            No activity logged yet. When visitors open your pages or click on actions, live events will appear here in real time.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {recentActivity.slice(0, 8).map((act) => (
+              <div
+                key={act.id}
+                className="flex items-start justify-between gap-3 p-3 rounded-xl bg-[#050e09] border border-[#16271c] text-xs"
+              >
+                <div className="flex items-start gap-2.5">
+                  <span className="mt-0.5 w-2 h-2 rounded-full bg-[#19e05f] shrink-0" />
+                  <div>
+                    <span className="font-semibold text-white mr-2">{act.action}</span>
+                    <span className="text-[#9aaaa0]">{act.details}</span>
+                  </div>
                 </div>
+                <span className="text-[11px] text-gray-500 whitespace-nowrap shrink-0">{act.timestamp}</span>
               </div>
-              <span className="text-[11px] text-gray-500 whitespace-nowrap shrink-0">{act.timestamp}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

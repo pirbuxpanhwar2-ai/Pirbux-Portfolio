@@ -24,7 +24,7 @@ export const initialPortfolioData: PortfolioState = {
       id: 'why-1',
       tag: 'Promotion',
       title: 'Restaurant Manager in 3 years',
-      description: 'Earned the management’s trust at Marhaba Restaurant and was promoted from Assistant Manager.',
+      description: 'Earned management’s trust at Marhaba Restaurant and was promoted from waiter to Restaurant Manager.',
       linkText: 'See my experience →',
       linkTarget: '#experience',
       targetCardIndex: 3
@@ -47,9 +47,10 @@ export const initialPortfolioData: PortfolioState = {
     }
   ],
   about: {
-    heading: 'About me: restaurant professional with six years in diverse dining, four of them in progressive management roles.',
+    heading: 'Hands-on experience in restaurant operations, guest service, and financial control across high-volume dining and upscale hospitality.',
     paragraphs: [
-      'I’m good at leading dynamic teams, improving how a restaurant runs day to day, and keeping guests satisfied. I care about developing people and delivering consistently high service. Above all, I love building positive dining experiences.'
+      'Joined Khoj Resorts Allana in February 2025 as a Food Server and was swiftly promoted to Cashier within my first year—a recognition of my strong work ethic, attention to detail, and operational excellence.',
+      'Skilled in Point-of-Sale (eZee Optimus) management, daily cash reconciliation, guest relations, and department inventory tracking. Committed to maintaining high standards of financial accuracy and delivering exceptional service standards that elevate guest experiences.'
     ],
     ctaText: 'Contact me →'
   },
@@ -57,7 +58,7 @@ export const initialPortfolioData: PortfolioState = {
     {
       id: 'j-1',
       time: 'Earlier',
-      role: 'Assistant Manager',
+      role: 'Waiter',
       company: 'Marhaba Restaurant, Hyderabad',
       isCurrent: false
     },
@@ -77,9 +78,9 @@ export const initialPortfolioData: PortfolioState = {
     },
     {
       id: 'j-4',
-      time: '2025 to present',
-      role: 'Cashier',
-      company: 'Khoj Resorts, Allana',
+      time: 'Feb 2025 to present',
+      role: 'Food Server → Cashier',
+      company: 'Khoj Resorts Allana (Promoted)',
       isCurrent: true
     },
     {
@@ -103,10 +104,15 @@ export const initialPortfolioData: PortfolioState = {
     {
       id: 'xp-2',
       number: '02',
-      role: 'Cashier',
-      period: '2025 to present',
-      company: 'Khoj Resorts, Allana',
-      details: 'Handling guest billing, cash management, POS systems, and reconciliation at the luxury resort.'
+      role: 'Food Server → Cashier (Promoted)',
+      period: 'Feb 2025 to Present',
+      company: 'Khoj Resorts Allana · On-site',
+      details:
+        '• Food Server (Joined Feb 2025): Hands-on experience in restaurant operations, guest service, and floor coordination. Maintained immaculate dining standards, welcomed guests with warm hospitality, and rapidly mastered resort F&B workflows.\n• Cashier (Promoted within 1st Year): Swiftly promoted in recognition of operational excellence and attention to detail. Skilled in Point-of-Sale (eZee Optimus) management, daily cash reconciliation, guest relations, department inventory tracking, and financial control.',
+      bullets: [
+        'Food Server (Joined Feb 2025): Hands-on experience in restaurant operations, guest service, and floor coordination. Maintained immaculate dining standards, welcomed guests with warm hospitality, and rapidly mastered resort F&B workflows.',
+        'Cashier (Promoted within 1st Year): Swiftly promoted in recognition of operational excellence and attention to detail. Skilled in Point-of-Sale (eZee Optimus) management, daily cash reconciliation, guest relations, department inventory tracking, and financial control.'
+      ]
     },
     {
       id: 'xp-3',
@@ -120,11 +126,15 @@ export const initialPortfolioData: PortfolioState = {
     {
       id: 'xp-4',
       number: '04',
-      role: 'Assistant Manager',
-      period: 'Earlier role',
-      company: 'Marhaba Restaurant, Hyderabad',
+      role: 'Waiter → Restaurant Manager (Promoted)',
+      period: 'Within 3 Years · Promoted',
+      company: 'Marhaba Restaurant, Hyderabad · On-site',
       details:
-        'Took pride in every detail and learned the ins and outs of daily operations. Earned management trust and was promoted to Restaurant Manager in just three years.'
+        '• Waiter (Initial Role): Began journey at Marhaba Restaurant, Hyderabad, as a humble waiter, eager to learn and contribute. With no shortcuts—just honesty, dedication, and a strong work ethic—took pride in every task, whether setting a perfect table or ensuring a guest left with a smile. Learned the ins and outs of daily operations, helped colleagues, and always put the customer first.\n• Restaurant Manager (Promoted in 3 Years): Management noticed my dedication, and within just three years, promoted me to Restaurant Manager. Led the very team I once served alongside, driving improvements in service, team morale, and guest satisfaction.',
+      bullets: [
+        'Waiter (Initial Role): Began journey at Marhaba Restaurant, Hyderabad, as a humble waiter, eager to learn and contribute. With no shortcuts—just honesty, dedication, and a strong work ethic—took pride in every task, whether setting a perfect table or ensuring a guest left with a smile. Consistently went beyond duties, learning the ins and outs of daily operations, helping colleagues, and always putting the customer first.',
+        'Restaurant Manager (Promoted in 3 Years): Management noticed my commitment, and within just three years, promoted me to Restaurant Manager. Led the very team I once served alongside, driving improvements in service, team morale, and guest satisfaction. A testament to how hard work and integrity turn opportunities into success.'
+      ]
     }
   ],
   certificates: (extractedAssets.certificates || []) as any,
@@ -216,6 +226,8 @@ export const initialPortfolioData: PortfolioState = {
       name: 'Training & tools',
       icon: 'cap',
       skills: [
+        { id: 's-pos', name: 'Point-of-Sale (eZee Optimus)', linkTarget: '#experience', cardIndex: 1 },
+        { id: 's-cash', name: 'Daily cash reconciliation', linkTarget: '#experience', cardIndex: 1 },
         { id: 's-8', name: 'Customer relationship management', linkTarget: '#cert-crm' },
         { id: 's-9', name: 'Hotel front desk operations', linkTarget: '#cert-desk' },
         { id: 's-10', name: 'Excel & Word', linkTarget: '#rec-bobby' },
@@ -305,194 +317,32 @@ export const initialPortfolioData: PortfolioState = {
     locationAddress: 'Scheme 33, District Malir, Karachi',
     qrCodeDataUrl: extractedAssets.qrCode || ''
   },
-  files: [
-    {
-      id: 'file-1',
-      name: 'Pir_Bux_Resume_2026.pdf',
-      size: 248500,
-      type: 'pdf',
-      mimeType: 'application/pdf',
-      dataUrl: 'data:application/pdf;base64,JVBERi0xLjQKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwgL0xlbmd0aCA1IDAgUiAvRmlsdGVyIC9GbGF0ZURlY29kZSA+PgpzdHJlYW0KeAFjYmBgYGBiYGBwZWA4wMTAkMHAwAAiGJkYGJgZgHxjBhBAmYGBgQGkBQAoQwL+CmVuZHN0cmVhbQplbmRvYmoK',
-      uploadedAt: '2026-10-24 14:32',
-      tag: 'Resume'
-    },
-    {
-      id: 'file-2',
-      name: 'Restaurant_Duty_Roster_Template.xlsx',
-      size: 145200,
-      type: 'spreadsheet',
-      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      dataUrl: 'data:application/vnd.ms-excel;base64,UEsDBBQAAAAIAAAAAAAAAAAAAAAAAAAAAAA',
-      uploadedAt: '2026-10-25 09:15',
-      tag: 'Template'
-    },
-    {
-      id: 'file-3',
-      name: 'Profile_Portrait_Black_Suit.jpg',
-      size: 42100,
-      type: 'image',
-      mimeType: 'image/jpeg',
-      dataUrl: extractedAssets.slides?.[0]?.url || '',
-      uploadedAt: '2026-10-20 18:00',
-      tag: 'Profile Photo'
-    },
-    {
-      id: 'file-4',
-      name: 'Khoj_Employee_Of_The_Month.jpg',
-      size: 68400,
-      type: 'image',
-      mimeType: 'image/jpeg',
-      dataUrl: extractedAssets.certificates?.[0]?.imageUrl || '',
-      uploadedAt: '2026-10-22 11:20',
-      tag: 'Award'
-    },
-    {
-      id: 'file-5',
-      name: 'Portfolio_QR_Code.svg',
-      size: 3200,
-      type: 'image',
-      mimeType: 'image/svg+xml',
-      dataUrl: extractedAssets.qrCode || '',
-      uploadedAt: '2026-10-23 10:45',
-      tag: 'QR Code'
-    }
-  ],
-  inbox: [
-    {
-      id: 'inb-1',
-      name: 'Tariq Mehmood',
-      email: 'tariq.dining@gmail.com',
-      subject: 'Interview for Restaurant General Manager position',
-      message:
-        'Dear Pir Bux, we reviewed your impressive experience at Kababjees Express and Marhaba Restaurant. We would like to invite you for a detailed discussion regarding a Restaurant Manager role in DHA Karachi.',
-      createdAt: '2026-10-26 15:40',
-      status: 'unread',
-      type: 'contact'
-    },
-    {
-      id: 'inb-2',
-      name: 'Hamza Sheikh',
-      email: 'h.sheikh@flavorshospitality.com',
-      subject: 'Custom Excel KPI Dashboard & Duty Roster Consultation',
-      message:
-        'Hello Pir Bux, saw your Excel KPI dashboard demo on your portfolio. We run 3 branches in Karachi and need an automated weekly sales and food cost tracking sheet. Are you available for freelance project work?',
-      createdAt: '2026-10-26 10:15',
-      status: 'read',
-      type: 'contact'
-    },
-    {
-      id: 'inb-3',
-      name: 'Zubair Qureshi',
-      email: 'zubair.q@gmail.com',
-      subject: 'Colleague Recommendation submission',
-      message:
-        'Pir Bux is a stellar manager who treats his team with dignity while delivering exceptional shift numbers. Proud to have worked alongside him.',
-      createdAt: '2026-10-25 19:22',
-      status: 'read',
-      type: 'recommendation',
-      roleAndCompany: 'F&B Floor Supervisor, Marhaba Restaurant',
-      relationship: 'Worked together 2021-2023'
-    }
-  ],
+  files: [],
+  inbox: [],
   analytics: {
     summary: {
-      totalPageViews: 2489,
-      uniqueVisitors: 1140,
-      engagementActions: 512,
-      whatsappInquiries: 94,
-      downloads: 68,
-      formSubmissions: 23,
-      recommendationsSubmitted: 7,
-      avgSessionSeconds: 165,
-      bounceRate: 26.2
+      totalPageViews: 0,
+      uniqueVisitors: 0,
+      engagementActions: 0,
+      whatsappInquiries: 0,
+      downloads: 0,
+      formSubmissions: 0,
+      recommendationsSubmitted: 0,
+      avgSessionSeconds: 0,
+      bounceRate: 0
     },
-    dailyTraffic: [
-      { date: '2026-10-20', day: 'Mon', pageViews: 295, uniqueVisitors: 142, engagement: 62 },
-      { date: '2026-10-21', day: 'Tue', pageViews: 310, uniqueVisitors: 155, engagement: 68 },
-      { date: '2026-10-22', day: 'Wed', pageViews: 280, uniqueVisitors: 138, engagement: 54 },
-      { date: '2026-10-23', day: 'Thu', pageViews: 345, uniqueVisitors: 168, engagement: 79 },
-      { date: '2026-10-24', day: 'Fri', pageViews: 420, uniqueVisitors: 195, engagement: 92 },
-      { date: '2026-10-25', day: 'Sat', pageViews: 465, uniqueVisitors: 215, engagement: 104 },
-      { date: '2026-10-26', day: 'Sun', pageViews: 374, uniqueVisitors: 182, engagement: 83 }
-    ],
-    sources: [
-      { name: 'LinkedIn', percentage: 44, count: 1095, color: '#0077b5' },
-      { name: 'WhatsApp Referrals', percentage: 24, count: 597, color: '#25D366' },
-      { name: 'Direct / QR Code Scan', percentage: 17, count: 423, color: '#19e05f' },
-      { name: 'Google Search', percentage: 10, count: 249, color: '#4285F4' },
-      { name: 'Foodpanda / Industry', percentage: 5, count: 125, color: '#D70F64' }
-    ],
-    devices: [
-      { device: 'Mobile', percentage: 67, count: 1667 },
-      { device: 'Desktop', percentage: 29, count: 722 },
-      { device: 'Tablet', percentage: 4, count: 100 }
-    ],
-    locations: [
-      { city: 'Karachi', country: 'Pakistan', count: 1145, percentage: 46 },
-      { city: 'Hyderabad', country: 'Pakistan', count: 423, percentage: 17 },
-      { city: 'Lahore', country: 'Pakistan', count: 298, percentage: 12 },
-      { city: 'Dubai', country: 'United Arab Emirates', count: 274, percentage: 11 },
-      { city: 'Islamabad', country: 'Pakistan', count: 199, percentage: 8 },
-      { city: 'Riyadh', country: 'Saudi Arabia', count: 150, percentage: 6 }
-    ],
-    actions: [
-      { action: 'WhatsApp Chat Initiated', count: 94, category: 'lead' },
-      { action: 'Certificate Lightbox Viewed', count: 186, category: 'engagement' },
-      { action: 'Service Inquiry Clicked', count: 82, category: 'lead' },
-      { action: 'Language Switched (Urdu)', count: 135, category: 'localization' },
-      { action: 'Resume PDF Downloaded', count: 68, category: 'download' },
-      { action: 'Contact Form Submitted', count: 23, category: 'lead' },
-      { action: 'QR Code Enlarge Viewed', count: 54, category: 'engagement' }
-    ],
-    recentActivity: [
-      {
-        id: 'act-1',
-        timestamp: 'Just now',
-        action: 'Page View',
-        details: 'Visitor landed on #top from LinkedIn Karachi',
-        category: 'view'
-      },
-      {
-        id: 'act-2',
-        timestamp: '12 mins ago',
-        action: 'WhatsApp Inquiry',
-        details: 'User initiated WhatsApp query for "KPI Dashboards"',
-        category: 'inquiry'
-      },
-      {
-        id: 'act-3',
-        timestamp: '34 mins ago',
-        action: 'Certificate Viewed',
-        details: 'Certificate "Employee of the Month (Khoj Resorts)" opened in Lightbox',
-        category: 'click'
-      },
-      {
-        id: 'act-4',
-        timestamp: '1 hour ago',
-        action: 'Resume Downloaded',
-        details: 'Pir_Bux_Resume_2026.pdf downloaded by recruiter from Dubai, UAE',
-        category: 'download'
-      },
-      {
-        id: 'act-5',
-        timestamp: '2 hours ago',
-        action: 'Contact Form Submitted',
-        details: 'Tariq Mehmood sent message: "Interview for Restaurant GM position"',
-        category: 'inquiry'
-      },
-      {
-        id: 'act-6',
-        timestamp: '3 hours ago',
-        action: 'Language Switched',
-        details: 'Visitor toggled website language to Urdu',
-        category: 'click'
-      }
-    ]
+    dailyTraffic: [],
+    sources: [],
+    devices: [],
+    locations: [],
+    actions: [],
+    recentActivity: []
   },
   credentials: {
-    username: 'pirbux',
-    passwordHash: 'admin123',
-    lastLogin: '2026-10-27 04:00',
+    username: 'admin',
+    passwordHash: 'admin',
+    recoveryEmail: 'pirbuxpanhwar2@gmail.com',
+    lastLogin: '2026-10-29 02:00',
     rememberMe: true
   }
 };

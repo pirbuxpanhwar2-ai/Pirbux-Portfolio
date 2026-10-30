@@ -54,6 +54,7 @@ export interface ExperienceItem {
   period: string;
   company: string;
   details: string;
+  bullets?: string[];
 }
 
 export interface CertificateItem {
@@ -208,6 +209,7 @@ export interface AnalyticsData {
 export interface OwnerCredentials {
   username: string;
   passwordHash: string;
+  recoveryEmail?: string;
   lastLogin?: string;
   rememberMe: boolean;
 }

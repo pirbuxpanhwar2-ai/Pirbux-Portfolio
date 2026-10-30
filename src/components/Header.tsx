@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { KeyRound, ShieldCheck, Globe, Menu, X, ArrowUpRight } from 'lucide-react';
+import { KeyRound, ShieldCheck, Sun, Moon, Menu, X, ArrowUpRight } from 'lucide-react';
 
 interface HeaderProps {
   currentLang: 'en' | 'ur';
@@ -7,7 +7,10 @@ interface HeaderProps {
   isOwnerLoggedIn: boolean;
   onOpenOwnerPortal: () => void;
   onOpenLoginModal: () => void;
-  activeNav: string;
+  activeTab: string;
+  onSelectTab: (tabId: string) => void;
+  siteTheme: 'dark' | 'light';
+  onToggleSiteTheme: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,69 +19,127 @@ export const Header: React.FC<HeaderProps> = ({
   isOwnerLoggedIn,
   onOpenOwnerPortal,
   onOpenLoginModal,
-  activeNav
+  activeTab,
+  onSelectTab,
+  siteTheme,
+  onToggleSiteTheme
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { href: '#top', label: currentLang === 'ur' ? 'ہوم' : 'Home' },
-    { href: '#experience', label: currentLang === 'ur' ? 'تجربہ' : 'Experience' },
-    { href: '#certificates', label: currentLang === 'ur' ? 'سرٹیفکیٹس' : 'Certificates' },
-    { href: '#recommendations', label: currentLang === 'ur' ? 'سفارشات' : 'Recommendations' },
-    { href: '#skills', label: currentLang === 'ur' ? 'مہارتیں' : 'Skills' },
-    { href: '#services', label: currentLang === 'ur' ? 'خدمات' : 'Services' },
-    { href: '#education', label: currentLang === 'ur' ? 'تعلیم' : 'Education' },
-    { href: '#contact', label: currentLang === 'ur' ? 'رابطہ' : 'Contact' }
+  const tabs = [
+    { id: 'home', label: currentLang === 'ur' ? 'ہوم' : 'Home' },
+    { id: 'experience', label: currentLang === 'ur' ? 'تجربہ' : 'Experience' },
+    { id: 'certificates', label: currentLang === 'ur' ? 'سرٹیفکیٹس' : 'Certificates' },
+    { id: 'recommendations', label: currentLang === 'ur' ? 'سفارشات' : 'Recommendations' },
+    { id: 'skills', label: currentLang === 'ur' ? 'مہارتیں' : 'Skills' },
+    { id: 'services', label: currentLang === 'ur' ? 'خدمات' : 'Services' },
+    { id: 'education', label: currentLang === 'ur' ? 'تعلیم' : 'Education' },
+    { id: 'contact', label: currentLang === 'ur' ? 'رابطہ' : 'Contact' }
   ];
 
+  const handleTabClick = (tabId: string) => {
+    onSelectTab(tabId);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-30 pt-safe bg-gradient-to-b from-[#030604f2] to-[#03060400] backdrop-blur-[2px]">
-      <div className="max-w-[1180px] mx-auto px-5 h-[68px] flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-30 pt-safe bg-gradient-to-b from-[#030604f2] to-[#03060400] backdrop-blur-[2px] transition-colors">
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 h-[70px] flex items-center justify-between">
         {/* Brand */}
-        <a href="#top" className="flex flex-col font-semibold text-lg leading-tight text-white group">
+        <button
+          onClick={() => handleTabClick('home')}
+          className="flex flex-col text-left font-semibold text-lg leading-tight text-white group cursor-pointer"
+        >
           <span>Pir Bux</span>
           <small className="text-[11px] font-medium tracking-widest uppercase text-[#19e05f] group-hover:text-[#7cf0a3] transition-colors">
             {currentLang === 'ur' ? 'ہاسپیٹیلیٹی پروفیشنل' : 'Hospitality Professional'}
           </small>
-        </a>
+        </button>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
-          {navLinks.map((link) => {
-            const isActive = activeNav === link.href.replace('#', '');
+        {/* Desktop Page Navigation Tabs */}
+        <nav className="hidden xl:flex items-center gap-1.5 p-1 rounded-full bg-[#07110bcc] border border-[#16271c] backdrop-blur-md">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
             return (
-              <a
-                key={link.href}
-                href={link.href}
-                className={`relative transition-colors ${
-                  isActive ? 'text-[#19e05f]' : 'text-gray-200 hover:text-[#19e05f]'
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.id)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer relative ${
+                  isActive
+                    ? 'bg-[#19e05f] text-[#031007] font-semibold shadow-md shadow-[#19e05f33]'
+                    : 'text-gray-300 hover:text-white hover:bg-white/5'
                 }`}
               >
-                {isActive && (
-                  <span className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#19e05f]" />
-                )}
-                <span>{link.label}</span>
-              </a>
+                <span>{tab.label}</span>
+              </button>
             );
           })}
         </nav>
 
+        {/* Medium Screen Nav (More compact) */}
+        <nav className="hidden lg:flex xl:hidden items-center gap-4 text-xs font-medium">
+          {tabs.slice(0, 5).map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.id)}
+                className={`transition-colors cursor-pointer ${
+                  isActive ? 'text-[#19e05f] font-semibold underline underline-offset-4' : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => handleTabClick('contact')}
+            className={`transition-colors cursor-pointer ${
+              activeTab === 'contact' ? 'text-[#19e05f] font-semibold' : 'text-gray-300 hover:text-white'
+            }`}
+          >
+            {currentLang === 'ur' ? 'رابطہ' : 'Contact'}
+          </button>
+        </nav>
+
         {/* Actions on the right */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Global Light / Dark Theme Switcher Button */}
+          <button
+            onClick={onToggleSiteTheme}
+            type="button"
+            className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#0a1510] border border-[#1d5a35] text-gray-200 text-xs font-medium hover:border-[#19e05f] hover:text-[#19e05f] transition-all cursor-pointer shadow-sm"
+            title={siteTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            aria-label="Toggle site theme"
+          >
+            {siteTheme === 'light' ? (
+              <>
+                <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="hidden sm:inline">Dark</span>
+              </>
+            ) : (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">Light</span>
+              </>
+            )}
+          </button>
+
           {/* Owner Portal / Login Access Button */}
           {isOwnerLoggedIn ? (
             <button
               onClick={onOpenOwnerPortal}
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#19e05f]/20 border border-[#19e05f] text-[#19e05f] hover:bg-[#19e05f] hover:text-[#031007] transition-all shadow-md shadow-[#19e05f22]"
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#19e05f]/20 border border-[#19e05f] text-[#19e05f] hover:bg-[#19e05f] hover:text-[#031007] transition-all shadow-md shadow-[#19e05f22] cursor-pointer"
               title="Open Owner Management Portal"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Owner Portal</span>
+              <span className="hidden sm:inline">Owner Portal</span>
+              <span className="sm:hidden">Portal</span>
             </button>
           ) : (
             <button
               onClick={onOpenLoginModal}
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-[#0a1510] border border-[#1d5a35] text-gray-300 hover:border-[#19e05f] hover:text-[#19e05f] transition-all"
+              className="flex items-center gap-1.5 text-xs font-medium px-2.5 sm:px-3 py-1.5 rounded-full bg-[#0a1510] border border-[#1d5a35] text-gray-300 hover:border-[#19e05f] hover:text-[#19e05f] transition-all cursor-pointer"
               title="Owner Login (Pir Bux)"
             >
               <KeyRound className="w-3.5 h-3.5 text-[#19e05f]" />
@@ -90,24 +151,16 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onToggleLang}
             type="button"
-            className="px-3 py-1.5 rounded-full bg-[#0a1510] border border-[#1d5a35] text-gray-200 text-xs font-medium hover:border-[#19e05f] hover:text-[#19e05f] transition-all"
+            className="px-2.5 sm:px-3 py-1.5 rounded-full bg-[#0a1510] border border-[#1d5a35] text-gray-200 text-xs font-medium hover:border-[#19e05f] hover:text-[#19e05f] transition-all cursor-pointer"
             aria-label={currentLang === 'en' ? 'Switch to Urdu' : 'Switch to English'}
           >
             {currentLang === 'en' ? 'اردو' : 'English'}
           </button>
 
-          {/* Contact CTA */}
-          <a
-            href="#contact"
-            className="hidden md:inline-flex items-center gap-1.5 bg-[#19e05f] hover:bg-[#7cf0a3] text-[#031007] font-semibold text-xs px-4 py-2 rounded-full transition-all shadow-md shadow-[#19e05f33] hover:-translate-y-0.5"
-          >
-            {currentLang === 'ur' ? 'رابطہ کریں' : 'Contact me'}
-          </a>
-
           {/* Mobile menu toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl border border-[#16271c] text-white hover:border-[#19e05f] transition-colors"
+            className="lg:hidden p-2 rounded-xl border border-[#16271c] text-white hover:border-[#19e05f] transition-colors cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -115,37 +168,53 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Nav dropdown */}
+      {/* Mobile Nav Dropdown with Page Tabs */}
       {mobileMenuOpen && (
         <div className="lg:hidden mx-4 mt-2 p-4 bg-[#07110bf8] border border-[#16271c] rounded-2xl flex flex-col space-y-1 shadow-2xl backdrop-blur-xl">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 text-sm font-medium text-gray-200 hover:text-[#19e05f] border-b border-[#16271c] last:border-0"
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#19e05f] px-3 pb-2 border-b border-[#16271c]">
+            Pages &amp; Tabs
+          </div>
+          <div className="grid grid-cols-2 gap-1 pt-1">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabClick(tab.id)}
+                  className={`text-left py-2 px-3 text-xs font-medium rounded-xl transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#19e05f] text-[#031007] font-semibold shadow-sm'
+                      : 'text-gray-200 hover:text-[#19e05f] hover:bg-white/5'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="pt-3 border-t border-[#16271c] flex items-center justify-between">
+            <button
+              onClick={() => {
+                onToggleSiteTheme();
+                setMobileMenuOpen(false);
+              }}
+              className="text-xs text-gray-300 flex items-center gap-1.5 py-1.5"
             >
-              {link.label}
-            </a>
-          ))}
-          <div className="pt-2 flex flex-col gap-2">
-            <a
-              href="#contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-center py-2 bg-[#19e05f] text-[#031007] font-semibold rounded-xl text-xs"
-            >
-              {currentLang === 'ur' ? 'رابطہ کریں' : 'Contact me'}
-            </a>
+              {siteTheme === 'light' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
+              <span>{siteTheme === 'light' ? 'Switch to Dark Theme' : 'Switch to Light Theme'}</span>
+            </button>
+
             {!isOwnerLoggedIn && (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenLoginModal();
                 }}
-                className="w-full py-2 bg-[#0a1510] border border-[#1d5a35] text-gray-300 rounded-xl text-xs flex items-center justify-center gap-1.5"
+                className="text-xs text-[#19e05f] font-medium flex items-center gap-1"
               >
-                <KeyRound className="w-3.5 h-3.5 text-[#19e05f]" />
-                <span>Owner Portal Login</span>
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>Owner Login</span>
               </button>
             )}
           </div>

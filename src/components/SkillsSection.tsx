@@ -29,28 +29,28 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({
   };
 
   return (
-    <section id="skills" className="py-20 relative">
+    <section id="skills" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit Skills
         </button>
       )}
 
       <div className="max-w-[1080px] mx-auto px-5">
-        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-2">
+        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-1.5">
           My <span className="text-[#19e05f]">Skills</span>
         </h2>
-        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-2">
+        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-1 leading-normal">
           What I’ve learned and developed over six years in restaurants.
         </p>
-        <p className="text-xs text-center text-[#19e05f] font-medium mb-10">
+        <p className="text-xs text-center text-[#19e05f] font-medium mb-6 sm:mb-8">
           Tap a highlighted skill to see the proof.
         </p>
 
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-3xl mx-auto space-y-3">
           {categories.map((cat) => (
             <div
               key={cat.id}

@@ -144,7 +144,6 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
         {[
           { id: 'hero', label: 'Hero & Title', icon: Layers },
           { id: 'slides', label: 'Photos / Slides', icon: ImageIcon },
-          { id: 'about', label: 'About Me', icon: Edit2 },
           { id: 'journey', label: 'Journey Timeline', icon: FileCheck },
           { id: 'experience', label: 'Work Experience', icon: Briefcase },
           { id: 'certificates', label: 'Certificates & Awards', icon: Award },
@@ -332,7 +331,7 @@ export const ContentEditorTab: React.FC<ContentEditorTabProps> = ({
             {/* Quick Facts */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
               <div>
-                <label className="block text-gray-400 mb-1">Years in Dining</label>
+                <label className="block text-gray-400 mb-1">Years in Restaurant Management</label>
                 <input
                   type="text"
                   value={heroDraft.diningYears}

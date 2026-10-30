@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RecommendationItem, InboxMessage } from '../types/portfolio';
-import { Star, Send, CheckCircle2, Linkedin, Edit2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Send, CheckCircle2, Linkedin, Edit2 } from 'lucide-react';
 
 interface RecommendationsSectionProps {
   recommendations: RecommendationItem[];
@@ -15,6 +15,10 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
   quickEditMode,
   onQuickEdit
 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+
   const [name, setName] = useState('');
   const [roleAndCompany, setRoleAndCompany] = useState('');
   const [relationship, setRelationship] = useState('');
@@ -23,6 +27,32 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
   const [errorMsg, setErrorMsg] = useState('');
 
   const approvedRecs = recommendations.filter((r) => r.isApproved);
+
+  const scrollToCard = (idx: number) => {
+    if (approvedRecs.length === 0) return;
+    const nextIdx = (idx + approvedRecs.length) % approvedRecs.length;
+    setCurrentIndex(nextIdx);
+
+    if (trackRef.current) {
+      const cards = trackRef.current.querySelectorAll('.rec-card');
+      const targetCard = cards[nextIdx] as HTMLElement;
+      if (targetCard) {
+        trackRef.current.scrollTo({
+          left: targetCard.offsetLeft - (trackRef.current.clientWidth - targetCard.offsetWidth) / 2,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
+  // Auto-advance carousel every 6 seconds (pauses on hover)
+  useEffect(() => {
+    if (isPaused || approvedRecs.length <= 1) return;
+    const interval = setInterval(() => {
+      scrollToCard(currentIndex + 1);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [currentIndex, isPaused, approvedRecs.length]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,38 +80,52 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
   };
 
   return (
-    <section id="recommendations" className="py-20 relative">
+    <section id="recommendations" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit Recommendations
         </button>
       )}
 
-      <div className="max-w-[1080px] mx-auto px-5">
-        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-2">
+      <div className="max-w-[1080px] mx-auto px-5 text-center mb-5 sm:mb-6">
+        <h2 className="text-3xl sm:text-4xl font-normal mb-1.5">
           What They <span className="text-[#19e05f]">Say</span>
         </h2>
-        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-12">
+        <p className="text-xs sm:text-sm text-[#9aaaa0] max-w-xl mx-auto leading-normal">
           Recommendations from colleagues and managers, as they appear on my LinkedIn profile.
         </p>
+      </div>
 
-        {/* Testimonials Masonry / Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5">
-          {approvedRecs.map((rec) => (
+      {/* Carousel Track: identical options to Experience section */}
+      <div
+        ref={trackRef}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+        className="relative flex gap-4 sm:gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-[10vw] scrollbar-none [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]"
+      >
+        {approvedRecs.map((rec, idx) => {
+          const isSelected = idx === currentIndex;
+          return (
             <figure
-              key={rec.id}
-              id={rec.id}
-              className="break-inside-avoid p-6 rounded-3xl bg-gradient-to-br from-[#0f1d15] to-[#060d09] border border-[#16271c] hover:border-[#1d5a35] transition-all relative overflow-hidden shadow-lg group hover:-translate-y-1"
+              key={rec.id || idx}
+              onClick={() => scrollToCard(idx)}
+              className={`rec-card shrink-0 w-[min(380px,82vw)] snap-center rounded-[28px] p-6 sm:p-8 cursor-pointer transition-all duration-500 border relative overflow-hidden flex flex-col justify-between ${
+                isSelected
+                  ? 'bg-gradient-to-br from-[#12241b] to-[#07100b] border-[#1d5a35] scale-100 opacity-100 shadow-[0_20px_50px_rgba(25,224,95,0.14)]'
+                  : 'bg-gradient-to-br from-[#0f1d15] to-[#060d09] border-[#16271c] scale-95 opacity-55 hover:opacity-80'
+              }`}
             >
               {/* Decorative quotation mark */}
               <span className="absolute top-2 right-4 text-7xl font-serif text-[#19e05f]/15 leading-none select-none pointer-events-none">
                 “
               </span>
 
-              <blockquote className="mb-4 text-xs sm:text-sm text-[#d3dfd8] leading-relaxed relative z-1">
+              <blockquote className="mb-6 text-xs sm:text-sm text-[#d3dfd8] leading-relaxed relative z-1">
                 <p>{rec.quote}</p>
               </blockquote>
 
@@ -89,7 +133,7 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
                 <div className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center font-bold text-xs text-[#031007] bg-gradient-to-br from-[#19e05f] to-[#7cf0a3] shadow-md shadow-[#19e05f22]">
                   {rec.avatarInitials || 'PB'}
                 </div>
-                <div className="min-w-0 flex-1 text-xs">
+                <div className="min-w-0 flex-1 text-xs text-left">
                   {rec.profileUrl ? (
                     <a
                       href={rec.profileUrl}
@@ -110,13 +154,47 @@ export const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({
                 </div>
               </figcaption>
             </figure>
+          );
+        })}
+      </div>
+
+      {/* Carousel Controls: identical arrows and dots to Experience section */}
+      <div className="flex items-center justify-center gap-4 mt-6">
+        <button
+          onClick={() => scrollToCard(currentIndex - 1)}
+          className="w-10 h-10 rounded-full border border-[#1d3a28] bg-[#0a1510] text-white hover:border-[#19e05f] flex items-center justify-center transition-colors"
+          aria-label="Previous recommendation"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+
+        <div className="flex gap-2">
+          {approvedRecs.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => scrollToCard(idx)}
+              className={`h-2 rounded-full transition-all ${
+                idx === currentIndex ? 'w-6 bg-[#19e05f]' : 'w-2 bg-[#24402e] hover:bg-[#1d5a35]'
+              }`}
+              aria-label={`Go to recommendation ${idx + 1}`}
+            />
           ))}
         </div>
 
-        {/* Interactive "Worked with me? Recommend me" Form */}
+        <button
+          onClick={() => scrollToCard(currentIndex + 1)}
+          className="w-10 h-10 rounded-full border border-[#1d3a28] bg-[#0a1510] text-white hover:border-[#19e05f] flex items-center justify-center transition-colors"
+          aria-label="Next recommendation"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Interactive "Worked with me? Recommend me" Form */}
+      <div className="max-w-[1080px] mx-auto px-5 mt-8 sm:mt-10">
         <form
           onSubmit={handleSubmit}
-          className="max-w-2xl mx-auto mt-16 p-6 sm:p-8 rounded-3xl bg-[#0a130d] border border-[#16271c] shadow-2xl text-xs space-y-4"
+          className="max-w-2xl mx-auto p-5 sm:p-6 rounded-3xl bg-[#0a130d] border border-[#16271c] shadow-2xl text-xs space-y-3"
         >
           <div>
             <h3 className="text-xl font-medium text-white mb-1">

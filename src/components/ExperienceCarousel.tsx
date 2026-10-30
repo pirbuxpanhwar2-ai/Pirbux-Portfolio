@@ -56,21 +56,21 @@ export const ExperienceCarousel: React.FC<ExperienceCarouselProps> = ({
   }, [activeIdx, isPaused, experience.length]);
 
   return (
-    <section id="experience" className="py-20 relative">
+    <section id="experience" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit Experience
         </button>
       )}
 
-      <div className="max-w-[1080px] mx-auto px-5 text-center mb-8">
-        <h2 className="text-3xl sm:text-4xl font-normal mb-2">
+      <div className="max-w-[1080px] mx-auto px-5 text-center mb-5 sm:mb-6">
+        <h2 className="text-3xl sm:text-4xl font-normal mb-1.5">
           My <span className="text-[#19e05f]">Experience</span>
         </h2>
-        <p className="text-xs sm:text-sm text-[#9aaaa0] max-w-xl mx-auto">
+        <p className="text-xs sm:text-sm text-[#9aaaa0] max-w-xl mx-auto leading-normal">
           Where I’ve worked and what I’ve run, from assistant manager to business owner.
         </p>
       </div>
@@ -82,7 +82,7 @@ export const ExperienceCarousel: React.FC<ExperienceCarouselProps> = ({
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setIsPaused(false)}
-        className="relative flex gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 px-[10vw] scrollbar-none [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]"
+        className="relative flex gap-4 sm:gap-5 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-[10vw] scrollbar-none [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]"
       >
         {experience.map((item, idx) => {
           const isSelected = idx === activeIdx;
@@ -90,16 +90,16 @@ export const ExperienceCarousel: React.FC<ExperienceCarouselProps> = ({
             <article
               key={item.id || idx}
               onClick={() => scrollToCard(idx)}
-              className={`xp-card shrink-0 w-[min(380px,82vw)] snap-center rounded-[28px] p-6 sm:p-8 cursor-pointer transition-all duration-500 border ${
+              className={`xp-card shrink-0 w-[min(380px,82vw)] snap-center rounded-[24px] p-5 sm:p-6 cursor-pointer transition-all duration-500 border ${
                 isSelected
                   ? 'bg-gradient-to-br from-[#12241b] to-[#07100b] border-[#1d5a35] scale-100 opacity-100 shadow-[0_20px_50px_rgba(25,224,95,0.14)]'
                   : 'bg-gradient-to-br from-[#0f1d15] to-[#060d09] border-[#16271c] scale-95 opacity-55 hover:opacity-80'
               }`}
             >
-              <div className="text-3xl sm:text-4xl font-bold text-[#19e05f] mb-2 leading-none font-mono">
+              <div className="text-2xl sm:text-3xl font-bold text-[#19e05f] mb-1.5 leading-none font-mono">
                 {item.number || `0${idx + 1}`}
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4">{item.role}</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2.5 leading-snug">{item.role}</h3>
 
               <table className="w-full border-collapse text-xs leading-relaxed text-left">
                 <tbody>
@@ -119,7 +119,29 @@ export const ExperienceCarousel: React.FC<ExperienceCarouselProps> = ({
                     <th className="py-2.5 pr-2.5 w-16 text-[#19e05f] uppercase tracking-wider font-semibold text-[10px] align-top">
                       Details
                     </th>
-                    <td className="py-2.5 text-gray-300 leading-relaxed">{item.details}</td>
+                    <td className="py-2.5 text-gray-300 leading-relaxed">
+                      {item.bullets && item.bullets.length > 0 ? (
+                        <ul className="space-y-2 list-none p-0 m-0">
+                          {item.bullets.map((bullet, bIdx) => (
+                            <li key={bIdx} className="flex items-start gap-2 text-xs leading-relaxed">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#19e05f] mt-1.5 shrink-0" />
+                              <span>{bullet}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : item.details.includes('\n') ? (
+                        <ul className="space-y-2 list-none p-0 m-0">
+                          {item.details.split('\n').filter(Boolean).map((line, lIdx) => (
+                            <li key={lIdx} className="flex items-start gap-2 text-xs leading-relaxed">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#19e05f] mt-1.5 shrink-0" />
+                              <span>{line.replace(/^[•\-\*]\s*/, '')}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        item.details
+                      )}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -129,7 +151,7 @@ export const ExperienceCarousel: React.FC<ExperienceCarouselProps> = ({
       </div>
 
       {/* Carousel Controls */}
-      <div className="flex items-center justify-center gap-4 mt-6">
+      <div className="flex items-center justify-center gap-4 mt-4">
         <button
           onClick={() => scrollToCard(activeIdx - 1)}
           className="w-10 h-10 rounded-full border border-[#1d3a28] bg-[#0a1510] text-white hover:border-[#19e05f] flex items-center justify-center transition-colors"

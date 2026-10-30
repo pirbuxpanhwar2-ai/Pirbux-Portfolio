@@ -5,7 +5,9 @@ import {
   resetPortfolioState,
   loadOwnerAuth,
   saveOwnerAuth,
-  logActivity
+  logActivity,
+  loadSiteTheme,
+  saveSiteTheme
 } from './utils/storage';
 import {
   PortfolioState,
@@ -21,7 +23,6 @@ import { OwnerLoginModal } from './components/owner/OwnerLoginModal';
 import { OwnerPortalModal } from './components/owner/OwnerPortalModal';
 import { HeroSection } from './components/HeroSection';
 import { WhyHireMe } from './components/WhyHireMe';
-import { AboutSection } from './components/AboutSection';
 import { JourneySection } from './components/JourneySection';
 import { ExperienceCarousel } from './components/ExperienceCarousel';
 import { CertificatesSection } from './components/CertificatesSection';
@@ -33,6 +34,29 @@ import { EducationSection } from './components/EducationSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import {
+  Briefcase,
+  Award,
+  MessageSquareQuote,
+  Sparkles,
+  Layers,
+  GraduationCap,
+  Mail,
+  Home,
+  ArrowRight,
+  ArrowLeft,
+  ChevronRight
+} from 'lucide-react';
+
+export type PageTab =
+  | 'home'
+  | 'experience'
+  | 'certificates'
+  | 'recommendations'
+  | 'skills'
+  | 'services'
+  | 'education'
+  | 'contact';
 
 export default function App() {
   const [portfolio, setPortfolio] = useState<PortfolioState>(loadPortfolioState);
@@ -42,14 +66,92 @@ export default function App() {
   const [portalInitialTab, setPortalInitialTab] = useState<string>('analytics');
   const [quickEditMode, setQuickEditMode] = useState<boolean>(false);
 
+  // Global Site Theme (Light / Dark)
+  const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>(loadSiteTheme);
+
+  // Active Multi-Page Tab
+  const [activeTab, setActiveTab] = useState<PageTab>(() => {
+    try {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const validTabs: PageTab[] = [
+        'home',
+        'experience',
+        'certificates',
+        'recommendations',
+        'skills',
+        'services',
+        'education',
+        'contact'
+      ];
+      if (validTabs.includes(hash as PageTab)) {
+        return hash as PageTab;
+      }
+      if (hash === 'top' || hash === '') return 'home';
+    } catch {
+      // ignore
+    }
+    return 'home';
+  });
+
   const [currentLang, setCurrentLang] = useState<'en' | 'ur'>('en');
-  const [activeNav, setActiveNav] = useState<string>('top');
   const [selectedCertificate, setSelectedCertificate] = useState<CertificateItem | null>(null);
   const [selectedExperienceIndex, setSelectedExperienceIndex] = useState<number | undefined>(undefined);
   const [cursorBubbleEnabled, setCursorBubbleEnabled] = useState<boolean>(true);
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [cursorTarget, setCursorTarget] = useState({ x: -100, y: -100 });
   const [isCursorHovering, setIsCursorHovering] = useState(false);
+
+  // Tab definitions with sequence for Prev/Next navigation
+  const tabSequence: { id: PageTab; label: string; icon: React.ReactNode; subtitle: string }[] = [
+    {
+      id: 'home',
+      label: 'Home',
+      icon: <Home className="w-4 h-4" />,
+      subtitle: 'Overview, Professional Journey & Core Value Proposition'
+    },
+    {
+      id: 'experience',
+      label: 'Experience',
+      icon: <Briefcase className="w-4 h-4" />,
+      subtitle: '6+ Years Leading Dining & Restaurant Management in Karachi'
+    },
+    {
+      id: 'certificates',
+      label: 'Certificates',
+      icon: <Award className="w-4 h-4" />,
+      subtitle: 'Verified Licenses, Awards & Professional Credentials'
+    },
+    {
+      id: 'recommendations',
+      label: 'Recommendations',
+      icon: <MessageSquareQuote className="w-4 h-4" />,
+      subtitle: 'Endorsements from Restaurant Owners, GMs & Head Chefs'
+    },
+    {
+      id: 'skills',
+      label: 'Skills',
+      icon: <Sparkles className="w-4 h-4" />,
+      subtitle: 'Hospitality Operations, Leadership, Multi-Lingual & Digital Tools'
+    },
+    {
+      id: 'services',
+      label: 'Services',
+      icon: <Layers className="w-4 h-4" />,
+      subtitle: 'Custom Excel Spreadsheets, Automated KPI Dashboards & Consultation'
+    },
+    {
+      id: 'education',
+      label: 'Education',
+      icon: <GraduationCap className="w-4 h-4" />,
+      subtitle: 'Academic Background & Secondary Education Qualifications'
+    },
+    {
+      id: 'contact',
+      label: 'Contact',
+      icon: <Mail className="w-4 h-4" />,
+      subtitle: 'Direct Phone, WhatsApp, Email, Karachi Address & QR Code'
+    }
+  ];
 
   // Initialize analytics session & page view on load
   useEffect(() => {
@@ -58,11 +160,47 @@ export default function App() {
     );
   }, []);
 
+  // Listen to hash changes for browser forward/back buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const validTabs: PageTab[] = [
+        'home',
+        'experience',
+        'certificates',
+        'recommendations',
+        'skills',
+        'services',
+        'education',
+        'contact'
+      ];
+      if (validTabs.includes(hash as PageTab)) {
+        setActiveTab(hash as PageTab);
+      } else if (hash === 'top' || hash === '') {
+        setActiveTab('home');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   // Sync language with document attribute
   useEffect(() => {
     document.documentElement.lang = currentLang;
     document.documentElement.dir = currentLang === 'ur' ? 'rtl' : 'ltr';
   }, [currentLang]);
+
+  // Sync site theme with document root & body
+  useEffect(() => {
+    if (siteTheme === 'light') {
+      document.documentElement.classList.add('site-light');
+      document.body.classList.add('site-light');
+    } else {
+      document.documentElement.classList.remove('site-light');
+      document.body.classList.remove('site-light');
+    }
+  }, [siteTheme]);
 
   // Keyboard shortcut: Ctrl+Shift+A or Cmd+Shift+A to open Owner Portal / Login
   useEffect(() => {
@@ -109,28 +247,24 @@ export default function App() {
     };
   }, [cursorBubbleEnabled, cursorTarget]);
 
-  // ScrollSpy to update active nav state
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = ['top', 'experience', 'certificates', 'recommendations', 'skills', 'services', 'education', 'contact'];
-      const scrollPos = window.scrollY + 200;
+  // Switch page tab handler
+  const handleSelectTab = (tabId: string) => {
+    const target = tabId as PageTab;
+    setActiveTab(target);
+    window.location.hash = '#' + target;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            setActiveNav(sectionId);
-            break;
-          }
-        }
-      }
-    };
+    setPortfolio((prev) =>
+      logActivity(prev, 'Tab View', `Navigated to ${target} page tab`, 'view')
+    );
+  };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Toggle global site theme (dark / light)
+  const handleToggleSiteTheme = () => {
+    const next = siteTheme === 'dark' ? 'light' : 'dark';
+    setSiteTheme(next);
+    saveSiteTheme(next);
+  };
 
   // Handlers for updating portfolio data
   const handleUpdatePortfolio = (updated: Partial<PortfolioState>) => {
@@ -167,6 +301,23 @@ export default function App() {
     );
   };
 
+  // Dedicated Reset Password handler (used by Forgot Password flow)
+  const handleResetPassword = (newPassword: string) => {
+    const updatedCredentials: OwnerCredentials = {
+      ...portfolio.credentials,
+      passwordHash: newPassword,
+      lastLogin: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    };
+    const nextState = { ...portfolio, credentials: updatedCredentials };
+    setPortfolio(nextState);
+    savePortfolioState(nextState);
+    setIsOwnerLoggedIn(true);
+    saveOwnerAuth(true);
+    setPortfolio((prev) =>
+      logActivity(prev, 'Password Renewed', 'Owner password renewed via email reset flow', 'auth')
+    );
+  };
+
   const handleImportState = (imported: PortfolioState) => {
     setPortfolio(imported);
     savePortfolioState(imported);
@@ -196,26 +347,6 @@ export default function App() {
   const handleTrackAction = (actionName: string) => {
     setPortfolio((prev) =>
       logActivity(prev, actionName, `Visitor interaction: ${actionName}`, 'click')
-    );
-  };
-
-  const handleSubmitContact = (msg: Omit<InboxMessage, 'id' | 'createdAt' | 'status'>) => {
-    const newMsg: InboxMessage = {
-      ...msg,
-      id: 'inb-' + Date.now(),
-      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      status: 'unread'
-    };
-    const nextState = {
-      ...portfolio,
-      inbox: [newMsg, ...portfolio.inbox]
-    };
-    setPortfolio(nextState);
-    savePortfolioState(nextState);
-
-    // Increment lead analytics
-    setPortfolio((prev) =>
-      logActivity(prev, 'Contact Message', `Inquiry from ${msg.name}: "${msg.subject}"`, 'inquiry', 'formSubmissions')
     );
   };
 
@@ -256,8 +387,20 @@ export default function App() {
 
   const unreadInboxCount = portfolio.inbox.filter((m) => m.status === 'unread').length;
 
+  // Find index in sequence for Next / Prev navigation
+  const currentTabIndex = tabSequence.findIndex((t) => t.id === activeTab);
+  const prevTab = currentTabIndex > 0 ? tabSequence[currentTabIndex - 1] : null;
+  const nextTab = currentTabIndex < tabSequence.length - 1 ? tabSequence[currentTabIndex + 1] : null;
+  const currentTabInfo = tabSequence[currentTabIndex] || tabSequence[0];
+
   return (
-    <div className="min-h-screen bg-[#030604] text-[#f2f7f4] relative selection:bg-[#19e05f] selection:text-[#031007]">
+    <div
+      className={`min-h-screen relative selection:bg-[#19e05f] selection:text-[#031007] transition-colors duration-200 ${
+        siteTheme === 'light'
+          ? 'site-light bg-[#f8faf9] text-[#122117]'
+          : 'bg-[#030604] text-[#f2f7f4]'
+      }`}
+    >
       {/* Custom Cursor Bubble */}
       {cursorBubbleEnabled && (
         <div
@@ -298,139 +441,242 @@ export default function App() {
             setShowPortalModal(true);
           }}
           onOpenLoginModal={() => setShowLoginModal(true)}
-          activeNav={activeNav}
+          activeTab={activeTab}
+          onSelectTab={handleSelectTab}
+          siteTheme={siteTheme}
+          onToggleSiteTheme={handleToggleSiteTheme}
         />
       </div>
 
-      {/* Main Website Sections */}
-      <main>
-        {/* 1. Hero Section */}
-        <HeroSection
-          hero={portfolio.hero}
-          currentLang={currentLang}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+      {/* Main Multi-Page Container */}
+      <main className="pt-20">
+        {/* Page Tab Header & Quick Navigation Bar (shown for all tabs) */}
+        {activeTab !== 'home' && (
+          <div className="max-w-[1080px] mx-auto px-5 pt-3 pb-0">
+            {/* Breadcrumb row */}
+            <div className="flex items-center gap-2 text-xs text-[#9aaaa0] mb-1.5">
+              <button
+                onClick={() => handleSelectTab('home')}
+                className="hover:text-[#19e05f] transition-colors cursor-pointer flex items-center gap-1"
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span>Home</span>
+              </button>
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span className="text-[#19e05f] font-semibold">{currentTabInfo.label}</span>
+            </div>
 
-        {/* 2. Why Hire Me Cards */}
-        <WhyHireMe
-          cards={portfolio.whyCards}
-          onSelectExperienceCard={(idx) => {
-            setSelectedExperienceIndex(idx);
-            document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
 
-        {/* 3. About Me Section */}
-        <AboutSection
-          about={portfolio.about}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+          </div>
+        )}
 
-        {/* 4. Journey Timeline */}
-        <JourneySection
-          journey={portfolio.journey}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+        {/* ========================================================
+            TAB 1: HOME (Hero + Why Hire Me + Journey Timeline + Quick Page Directory)
+            ======================================================== */}
+        {activeTab === 'home' && (
+          <div className="space-y-4">
+            <HeroSection
+              hero={portfolio.hero}
+              currentLang={currentLang}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+              onNavigate={(tab) => handleSelectTab(tab)}
+            />
 
-        {/* 5. Experience Carousel */}
-        <ExperienceCarousel
-          experience={portfolio.experience}
-          selectedIndex={selectedExperienceIndex}
-          onSelectIndex={(idx) => setSelectedExperienceIndex(idx)}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+            <JourneySection
+              journey={portfolio.journey}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
 
-        {/* 6. Certificates & Awards */}
-        <CertificatesSection
-          certificates={portfolio.certificates}
-          onOpenLightbox={handleOpenCertificate}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+            <WhyHireMe
+              cards={portfolio.whyCards}
+              onSelectExperienceCard={(idx) => {
+                setSelectedExperienceIndex(idx);
+                handleSelectTab('experience');
+              }}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
 
-        {/* 7. Recommendations & Submission Form */}
-        <RecommendationsSection
-          recommendations={portfolio.recommendations}
-          onSubmitRecommendation={handleSubmitRecommendation}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+        {/* ========================================================
+            TAB 2: EXPERIENCE
+            ======================================================== */}
+        {activeTab === 'experience' && (
+          <div>
+            <ExperienceCarousel
+              experience={portfolio.experience}
+              selectedIndex={selectedExperienceIndex}
+              onSelectIndex={(idx) => setSelectedExperienceIndex(idx)}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
 
-        {/* 8. Skills Section */}
-        <SkillsSection
-          categories={portfolio.skills}
-          onSelectExperienceCard={(idx) => {
-            setSelectedExperienceIndex(idx);
-            document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+        {/* ========================================================
+            TAB 3: CERTIFICATES
+            ======================================================== */}
+        {activeTab === 'certificates' && (
+          <div>
+            <CertificatesSection
+              certificates={portfolio.certificates}
+              onOpenLightbox={handleOpenCertificate}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
 
-        {/* 9. Services & Interactive KPI Demo */}
-        <ServicesSection
-          services={portfolio.services}
-          whatsappNumber={portfolio.contact.whatsappNumber}
-          currentLang={currentLang}
-          onTrackAction={handleTrackAction}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+        {/* ========================================================
+            TAB 4: RECOMMENDATIONS
+            ======================================================== */}
+        {activeTab === 'recommendations' && (
+          <div>
+            <RecommendationsSection
+              recommendations={portfolio.recommendations}
+              onSubmitRecommendation={handleSubmitRecommendation}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
 
-        {/* 10. Education Section */}
-        <EducationSection
-          education={portfolio.education}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+        {/* ========================================================
+            TAB 5: SKILLS
+            ======================================================== */}
+        {activeTab === 'skills' && (
+          <div>
+            <SkillsSection
+              categories={portfolio.skills}
+              onSelectExperienceCard={(idx) => {
+                setSelectedExperienceIndex(idx);
+                handleSelectTab('experience');
+              }}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
 
-        {/* 11. Contact Section */}
-        <ContactSection
-          contact={portfolio.contact}
-          onSubmitContact={handleSubmitContact}
-          onTrackAction={handleTrackAction}
-          quickEditMode={quickEditMode}
-          onQuickEdit={() => {
-            setPortalInitialTab('content');
-            setShowPortalModal(true);
-          }}
-        />
+        {/* ========================================================
+            TAB 6: SERVICES
+            ======================================================== */}
+        {activeTab === 'services' && (
+          <div>
+            <ServicesSection
+              services={portfolio.services}
+              whatsappNumber={portfolio.contact.whatsappNumber}
+              currentLang={currentLang}
+              onTrackAction={handleTrackAction}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 7: EDUCATION
+            ======================================================== */}
+        {activeTab === 'education' && (
+          <div>
+            <EducationSection
+              education={portfolio.education}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 8: CONTACT
+            ======================================================== */}
+        {activeTab === 'contact' && (
+          <div>
+            <ContactSection
+              contact={portfolio.contact}
+              onTrackAction={handleTrackAction}
+              quickEditMode={quickEditMode}
+              onQuickEdit={() => {
+                setPortalInitialTab('content');
+                setShowPortalModal(true);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Previous Tab / Next Tab Navigation Bar */}
+        <div className="max-w-[1080px] mx-auto px-5 py-8 border-t border-[#16271c] mt-10">
+          <div className="flex items-center justify-between gap-4">
+            {prevTab ? (
+              <button
+                onClick={() => handleSelectTab(prevTab.id)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#07110bcc] border border-[#16271c] hover:border-[#19e05f] text-gray-300 hover:text-white transition-all text-xs font-medium cursor-pointer site-card"
+              >
+                <ArrowLeft className="w-4 h-4 text-[#19e05f]" />
+                <div className="text-left">
+                  <span className="block text-[10px] text-[#9aaaa0]">Previous Page</span>
+                  <span className="font-semibold text-white">{prevTab.label}</span>
+                </div>
+              </button>
+            ) : (
+              <div />
+            )}
+
+            {nextTab ? (
+              <button
+                onClick={() => handleSelectTab(nextTab.id)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#07110bcc] border border-[#16271c] hover:border-[#19e05f] text-gray-300 hover:text-white transition-all text-xs font-medium cursor-pointer site-card ml-auto"
+              >
+                <div className="text-right">
+                  <span className="block text-[10px] text-[#9aaaa0]">Next Page</span>
+                  <span className="font-semibold text-white">{nextTab.label}</span>
+                </div>
+                <ArrowRight className="w-4 h-4 text-[#19e05f]" />
+              </button>
+            ) : (
+              <button
+                onClick={() => handleSelectTab('home')}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#07110bcc] border border-[#16271c] hover:border-[#19e05f] text-gray-300 hover:text-white transition-all text-xs font-medium cursor-pointer site-card ml-auto"
+              >
+                <div className="text-right">
+                  <span className="block text-[10px] text-[#9aaaa0]">Back to start</span>
+                  <span className="font-semibold text-white">Home Page</span>
+                </div>
+                <Home className="w-4 h-4 text-[#19e05f]" />
+              </button>
+            )}
+          </div>
+        </div>
       </main>
 
       {/* Website Footer */}
@@ -443,6 +689,10 @@ export default function App() {
           setShowPortalModal(true);
         }}
         onOpenLoginModal={() => setShowLoginModal(true)}
+        onSelectTab={handleSelectTab}
+        siteTheme={siteTheme}
+        onToggleSiteTheme={handleToggleSiteTheme}
+        isHomePage={activeTab === 'home'}
       />
 
       {/* Floating Sticky WhatsApp Button */}
@@ -468,6 +718,7 @@ export default function App() {
         onClose={() => setShowLoginModal(false)}
         onLoginSuccess={handleLoginSuccess}
         credentials={portfolio.credentials}
+        onResetPassword={handleResetPassword}
       />
 
       {/* Full Owner Portal Modal (Analytics, Content Editor, File Manager, Inbox, Settings) */}

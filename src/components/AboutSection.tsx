@@ -14,11 +14,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   onQuickEdit
 }) => {
   return (
-    <section id="about" className="py-20 relative">
+    <section id="about" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit &quot;About Me&quot;
         </button>

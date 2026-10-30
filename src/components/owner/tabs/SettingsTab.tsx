@@ -1,5 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { KeyRound, Shield, Download, Upload, RotateCcw, Check, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import {
+  KeyRound,
+  Shield,
+  Download,
+  Upload,
+  RotateCcw,
+  Check,
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  Sun,
+  Moon,
+  Palette
+} from 'lucide-react';
 import { PortfolioState, OwnerCredentials } from '../../../types/portfolio';
 
 interface SettingsTabProps {
@@ -7,15 +20,20 @@ interface SettingsTabProps {
   onUpdateCredentials: (credentials: OwnerCredentials) => void;
   onImportState: (state: PortfolioState) => void;
   onResetDefault: () => void;
+  currentTheme?: 'dark' | 'light';
+  onSelectTheme?: (theme: 'dark' | 'light') => void;
 }
 
 export const SettingsTab: React.FC<SettingsTabProps> = ({
   portfolio,
   onUpdateCredentials,
   onImportState,
-  onResetDefault
+  onResetDefault,
+  currentTheme = 'dark',
+  onSelectTheme
 }) => {
-  const [username, setUsername] = useState(portfolio.credentials.username || 'pirbux');
+  const [username, setUsername] = useState(portfolio.credentials.username || 'admin');
+  const [recoveryEmail, setRecoveryEmail] = useState(portfolio.credentials.recoveryEmail || 'pirbuxpanhwar2@gmail.com');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,12 +55,26 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
     onUpdateCredentials({
       ...portfolio.credentials,
       username: username.trim(),
+      recoveryEmail: recoveryEmail.trim() || 'pirbuxpanhwar2@gmail.com',
       passwordHash: newPassword ? newPassword.trim() : portfolio.credentials.passwordHash
     });
 
     setNewPassword('');
     setConfirmPassword('');
-    setStatusMessage({ text: 'Owner credentials updated successfully!', type: 'success' });
+    setStatusMessage({ text: 'Owner credentials and password updated successfully!', type: 'success' });
+    setTimeout(() => setStatusMessage(null), 3000);
+  };
+
+  const handleQuickResetToDefaultCredentials = () => {
+    setUsername('admin');
+    setRecoveryEmail('pirbuxpanhwar2@gmail.com');
+    onUpdateCredentials({
+      ...portfolio.credentials,
+      username: 'admin',
+      passwordHash: 'admin',
+      recoveryEmail: 'pirbuxpanhwar2@gmail.com'
+    });
+    setStatusMessage({ text: 'Password and Login ID reset to default (admin / admin).', type: 'success' });
     setTimeout(() => setStatusMessage(null), 3000);
   };
 
@@ -109,7 +141,76 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         </div>
       )}
 
-      {/* Change Login Credentials Card */}
+      {/* 1. Portal Appearance & Theme Options */}
+      <div className="p-5 rounded-2xl bg-[#09150d] border border-[#16271c] space-y-4">
+        <div className="flex items-center gap-2.5 border-b border-[#16271c] pb-3">
+          <Palette className="w-5 h-5 text-[#19e05f]" />
+          <div>
+            <h4 className="font-semibold text-white text-sm">Portal Appearance &amp; Themes</h4>
+            <p className="text-[#9aaaa0] text-[11px]">Choose between the signature dark theme or the clean light theme</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Dark Emerald Option */}
+          <button
+            type="button"
+            onClick={() => onSelectTheme && onSelectTheme('dark')}
+            className={`p-4 rounded-xl border text-left flex items-start gap-3 transition-all ${
+              currentTheme === 'dark'
+                ? 'bg-[#0f2818] border-[#19e05f] shadow-lg shadow-[#19e05f15]'
+                : 'bg-[#050e09] border-[#1d4029] hover:border-[#19e05f]/50'
+            }`}
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#030604] border border-[#1d5a35] flex items-center justify-center text-[#19e05f] shrink-0">
+              <Moon className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-white text-xs">Dark Emerald Theme</span>
+                {currentTheme === 'dark' && (
+                  <span className="text-[10px] font-bold text-[#19e05f] bg-[#19e05f]/20 px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-400 text-[11px] mt-1">
+                Signature dark hospitality aesthetic with neon green accents and glow effects.
+              </p>
+            </div>
+          </button>
+
+          {/* Clean Light Option */}
+          <button
+            type="button"
+            onClick={() => onSelectTheme && onSelectTheme('light')}
+            className={`p-4 rounded-xl border text-left flex items-start gap-3 transition-all ${
+              currentTheme === 'light'
+                ? 'bg-amber-500/10 border-amber-400 shadow-lg shadow-amber-500/10'
+                : 'bg-[#050e09] border-[#1d4029] hover:border-amber-400/50'
+            }`}
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-600 shrink-0">
+              <Sun className="w-5 h-5" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-white text-xs">Clean Light Theme</span>
+                {currentTheme === 'light' && (
+                  <span className="text-[10px] font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-400 text-[11px] mt-1">
+                Crisp high-contrast daylight theme with bright slate cards and clear typography.
+              </p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Change Login Credentials Card */}
       <div className="p-5 rounded-2xl bg-[#09150d] border border-[#16271c] space-y-4">
         <div className="flex items-center gap-2.5 border-b border-[#16271c] pb-3">
           <KeyRound className="w-5 h-5 text-[#19e05f]" />
@@ -120,15 +221,30 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         </div>
 
         <form onSubmit={handleSaveCredentials} className="space-y-3 max-w-lg">
-          <div>
-            <label className="block text-gray-400 mb-1">Login ID (Username)</label>
-            <input
-              type="text"
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2.5 bg-[#050e09] border border-[#1d4029] rounded-xl text-white text-xs focus:outline-none focus:border-[#19e05f]"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-gray-400 mb-1">Login ID (Username)</label>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                className="w-full p-2.5 bg-[#050e09] border border-[#1d4029] rounded-xl text-white text-xs focus:outline-none focus:border-[#19e05f]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-400 mb-1">Recovery Email (Password Renewal)</label>
+              <input
+                type="email"
+                required
+                value={recoveryEmail}
+                onChange={(e) => setRecoveryEmail(e.target.value)}
+                placeholder="pirbuxpanhwar2@gmail.com"
+                className="w-full p-2.5 bg-[#050e09] border border-[#1d4029] rounded-xl text-white text-xs focus:outline-none focus:border-[#19e05f]"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -164,16 +280,25 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#19e05f] hover:bg-[#7cf0a3] text-[#031007] font-semibold rounded-xl text-xs transition-all"
-          >
-            Update Login Credentials
-          </button>
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-[#19e05f] hover:bg-[#7cf0a3] text-[#031007] font-semibold rounded-xl text-xs transition-all shadow-md shadow-[#19e05f22]"
+            >
+              Save Credentials &amp; Password
+            </button>
+            <button
+              type="button"
+              onClick={handleQuickResetToDefaultCredentials}
+              className="px-3.5 py-2 border border-[#1d4029] hover:border-[#19e05f] text-gray-300 hover:text-white rounded-xl text-xs transition-all bg-[#050e09]"
+            >
+              Reset to Default (admin / admin)
+            </button>
+          </div>
         </form>
       </div>
 
-      {/* Backup & Data Portability */}
+      {/* 3. Backup & Data Portability */}
       <div className="p-5 rounded-2xl bg-[#09150d] border border-[#16271c] space-y-4">
         <div className="flex items-center gap-2.5 border-b border-[#16271c] pb-3">
           <Shield className="w-5 h-5 text-[#19e05f]" />
@@ -225,7 +350,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         </div>
       </div>
 
-      {/* Danger Zone: Factory Reset */}
+      {/* 4. Danger Zone: Factory Reset */}
       <div className="p-5 rounded-2xl bg-red-950/20 border border-red-500/30 space-y-3">
         <div className="flex items-center gap-2 text-red-400 font-semibold text-sm">
           <RotateCcw className="w-4 h-4" />

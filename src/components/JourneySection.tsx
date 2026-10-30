@@ -13,26 +13,26 @@ export const JourneySection: React.FC<JourneySectionProps> = ({
   onQuickEdit
 }) => {
   return (
-    <section id="journey" className="py-16 relative">
+    <section id="journey" className="py-8 sm:py-10 relative">
       {quickEditMode && (
         <button
           onClick={onQuickEdit}
-          className="absolute top-4 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
+          className="absolute top-2 right-8 z-10 px-2.5 py-1 rounded-full bg-[#19e05f] text-[#031007] text-[11px] font-bold shadow-md hover:scale-105"
         >
           Edit Journey
         </button>
       )}
 
       <div className="max-w-[1080px] mx-auto px-5">
-        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-2">
+        <h2 className="text-3xl sm:text-4xl font-normal text-center mb-1.5">
           My <span className="text-[#19e05f]">Journey</span>
         </h2>
-        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-12">
+        <p className="text-xs sm:text-sm text-center text-[#9aaaa0] max-w-xl mx-auto mb-6 sm:mb-8 leading-normal">
           How I grew from assistant manager to running my own business.
         </p>
 
         {/* Timeline Path */}
-        <ol className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-4 list-none m-0 p-0 relative">
+        <ol className={`grid grid-cols-1 ${journey.length >= 6 ? 'md:grid-cols-6' : 'md:grid-cols-5'} gap-6 md:gap-4 list-none m-0 p-0 relative`}>
           {journey.map((item, idx) => (
             <li
               key={item.id || idx}
