@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   loadPortfolioState,
   savePortfolioState,
-  resetPortfolioState,
-  loadOwnerAuth,
-  saveOwnerAuth,
   logActivity,
   loadSiteTheme,
   saveSiteTheme
@@ -12,15 +9,9 @@ import {
 import {
   PortfolioState,
   CertificateItem,
-  UploadedFile,
-  OwnerCredentials,
-  InboxMessage,
-  RecommendationItem
+  InboxMessage
 } from './types/portfolio';
 import { Header } from './components/Header';
-import { OwnerAdminBar } from './components/owner/OwnerAdminBar';
-import { OwnerLoginModal } from './components/owner/OwnerLoginModal';
-import { OwnerPortalModal } from './components/owner/OwnerPortalModal';
 import { HeroSection } from './components/HeroSection';
 import { WhyHireMe } from './components/WhyHireMe';
 import { JourneySection } from './components/JourneySection';
@@ -60,11 +51,6 @@ export type PageTab =
 
 export default function App() {
   const [portfolio, setPortfolio] = useState<PortfolioState>(loadPortfolioState);
-  const [isOwnerLoggedIn, setIsOwnerLoggedIn] = useState<boolean>(loadOwnerAuth);
-  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-  const [showPortalModal, setShowPortalModal] = useState<boolean>(false);
-  const [portalInitialTab, setPortalInitialTab] = useState<string>('analytics');
-  const [quickEditMode, setQuickEditMode] = useState<boolean>(false);
 
   // Global Site Theme (Light / Dark)
   const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>(loadSiteTheme);
@@ -202,22 +188,6 @@ export default function App() {
     }
   }, [siteTheme]);
 
-  // Keyboard shortcut: Ctrl+Shift+A or Cmd+Shift+A to open Owner Portal / Login
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        if (isOwnerLoggedIn) {
-          setShowPortalModal(true);
-        } else {
-          setShowLoginModal(true);
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOwnerLoggedIn]);
-
   // Cursor bubble animation
   useEffect(() => {
     if (!cursorBubbleEnabled) return;
@@ -266,84 +236,6 @@ export default function App() {
     saveSiteTheme(next);
   };
 
-  // Handlers for updating portfolio data
-  const handleUpdatePortfolio = (updated: Partial<PortfolioState>) => {
-    const nextState = { ...portfolio, ...updated };
-    setPortfolio(nextState);
-    savePortfolioState(nextState);
-  };
-
-  const handleAddFile = (file: UploadedFile) => {
-    const updatedFiles = [file, ...portfolio.files];
-    const nextState = { ...portfolio, files: updatedFiles };
-    setPortfolio(nextState);
-    savePortfolioState(nextState);
-
-    // Track upload in activity
-    setPortfolio((prev) =>
-      logActivity(prev, 'File Uploaded', `Uploaded ${file.name} (${file.type})`, 'edit')
-    );
-  };
-
-  const handleDeleteFile = (fileId: string) => {
-    const updatedFiles = portfolio.files.filter((f) => f.id !== fileId);
-    const nextState = { ...portfolio, files: updatedFiles };
-    setPortfolio(nextState);
-    savePortfolioState(nextState);
-  };
-
-  const handleUpdateCredentials = (credentials: OwnerCredentials) => {
-    const nextState = { ...portfolio, credentials };
-    setPortfolio(nextState);
-    savePortfolioState(nextState);
-    setPortfolio((prev) =>
-      logActivity(prev, 'Credentials Updated', 'Owner credentials modified in settings', 'auth')
-    );
-  };
-
-  // Dedicated Reset Password handler (used by Forgot Password flow)
-  const handleResetPassword = (newPassword: string) => {
-    const updatedCredentials: OwnerCredentials = {
-      ...portfolio.credentials,
-      passwordHash: newPassword,
-      lastLogin: new Date().toISOString().replace('T', ' ').substring(0, 16)
-    };
-    const nextState = { ...portfolio, credentials: updatedCredentials };
-    setPortfolio(nextState);
-    savePortfolioState(nextState);
-    setIsOwnerLoggedIn(true);
-    saveOwnerAuth(true);
-    setPortfolio((prev) =>
-      logActivity(prev, 'Password Renewed', 'Owner password renewed via email reset flow', 'auth')
-    );
-  };
-
-  const handleImportState = (imported: PortfolioState) => {
-    setPortfolio(imported);
-    savePortfolioState(imported);
-  };
-
-  const handleResetDefault = () => {
-    const defaultState = resetPortfolioState();
-    setPortfolio(defaultState);
-  };
-
-  const handleLoginSuccess = () => {
-    setIsOwnerLoggedIn(true);
-    saveOwnerAuth(true);
-    setShowPortalModal(true);
-    setPortfolio((prev) =>
-      logActivity(prev, 'Owner Login', `Owner signed in as ${portfolio.credentials.username}`, 'auth')
-    );
-  };
-
-  const handleLogout = () => {
-    setIsOwnerLoggedIn(false);
-    saveOwnerAuth(false);
-    setShowPortalModal(false);
-    setQuickEditMode(false);
-  };
-
   const handleTrackAction = (actionName: string) => {
     setPortfolio((prev) =>
       logActivity(prev, actionName, `Visitor interaction: ${actionName}`, 'click')
@@ -385,8 +277,6 @@ export default function App() {
     );
   };
 
-  const unreadInboxCount = portfolio.inbox.filter((m) => m.status === 'unread').length;
-
   // Find index in sequence for Next / Prev navigation
   const currentTabIndex = tabSequence.findIndex((t) => t.id === activeTab);
   const prevTab = currentTabIndex > 0 ? tabSequence[currentTabIndex - 1] : null;
@@ -416,31 +306,11 @@ export default function App() {
         />
       )}
 
-      {/* Owner Admin Bar when logged in */}
-      {isOwnerLoggedIn && (
-        <OwnerAdminBar
-          onOpenPortal={(tab) => {
-            if (tab) setPortalInitialTab(tab);
-            setShowPortalModal(true);
-          }}
-          onLogout={handleLogout}
-          quickEditMode={quickEditMode}
-          onToggleQuickEdit={() => setQuickEditMode(!quickEditMode)}
-          unreadCount={unreadInboxCount}
-        />
-      )}
-
       {/* Website Header */}
-      <div className={isOwnerLoggedIn ? 'pt-10' : ''}>
+      <div>
         <Header
           currentLang={currentLang}
           onToggleLang={handleToggleLang}
-          isOwnerLoggedIn={isOwnerLoggedIn}
-          onOpenOwnerPortal={() => {
-            setPortalInitialTab('analytics');
-            setShowPortalModal(true);
-          }}
-          onOpenLoginModal={() => setShowLoginModal(true)}
           activeTab={activeTab}
           onSelectTab={handleSelectTab}
           siteTheme={siteTheme}
@@ -450,7 +320,7 @@ export default function App() {
 
       {/* Main Multi-Page Container */}
       <main className="pt-20">
-        {/* Page Tab Header & Quick Navigation Bar (shown for all tabs) */}
+        {/* Page Tab Header & Quick Navigation Bar (shown for non-home tabs) */}
         {activeTab !== 'home' && (
           <div className="max-w-[1080px] mx-auto px-5 pt-3 pb-0">
             {/* Breadcrumb row */}
@@ -465,34 +335,20 @@ export default function App() {
               <ChevronRight className="w-3.5 h-3.5" />
               <span className="text-[#19e05f] font-semibold">{currentTabInfo.label}</span>
             </div>
-
-
           </div>
         )}
 
-        {/* ========================================================
-            TAB 1: HOME (Hero + Why Hire Me + Journey Timeline + Quick Page Directory)
-            ======================================================== */}
+        {/* TAB 1: HOME */}
         {activeTab === 'home' && (
           <div className="space-y-4">
             <HeroSection
               hero={portfolio.hero}
               currentLang={currentLang}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
               onNavigate={(tab) => handleSelectTab(tab)}
             />
 
             <JourneySection
               journey={portfolio.journey}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
 
             <WhyHireMe
@@ -501,70 +357,42 @@ export default function App() {
                 setSelectedExperienceIndex(idx);
                 handleSelectTab('experience');
               }}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 2: EXPERIENCE
-            ======================================================== */}
+        {/* TAB 2: EXPERIENCE */}
         {activeTab === 'experience' && (
           <div>
             <ExperienceCarousel
               experience={portfolio.experience}
               selectedIndex={selectedExperienceIndex}
               onSelectIndex={(idx) => setSelectedExperienceIndex(idx)}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 3: CERTIFICATES
-            ======================================================== */}
+        {/* TAB 3: CERTIFICATES */}
         {activeTab === 'certificates' && (
           <div>
             <CertificatesSection
               certificates={portfolio.certificates}
               onOpenLightbox={handleOpenCertificate}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 4: RECOMMENDATIONS
-            ======================================================== */}
+        {/* TAB 4: RECOMMENDATIONS */}
         {activeTab === 'recommendations' && (
           <div>
             <RecommendationsSection
               recommendations={portfolio.recommendations}
               onSubmitRecommendation={handleSubmitRecommendation}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 5: SKILLS
-            ======================================================== */}
+        {/* TAB 5: SKILLS */}
         {activeTab === 'skills' && (
           <div>
             <SkillsSection
@@ -573,18 +401,11 @@ export default function App() {
                 setSelectedExperienceIndex(idx);
                 handleSelectTab('experience');
               }}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 6: SERVICES
-            ======================================================== */}
+        {/* TAB 6: SERVICES */}
         {activeTab === 'services' && (
           <div>
             <ServicesSection
@@ -592,44 +413,25 @@ export default function App() {
               whatsappNumber={portfolio.contact.whatsappNumber}
               currentLang={currentLang}
               onTrackAction={handleTrackAction}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 7: EDUCATION
-            ======================================================== */}
+        {/* TAB 7: EDUCATION */}
         {activeTab === 'education' && (
           <div>
             <EducationSection
               education={portfolio.education}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
 
-        {/* ========================================================
-            TAB 8: CONTACT
-            ======================================================== */}
+        {/* TAB 8: CONTACT */}
         {activeTab === 'contact' && (
           <div>
             <ContactSection
               contact={portfolio.contact}
               onTrackAction={handleTrackAction}
-              quickEditMode={quickEditMode}
-              onQuickEdit={() => {
-                setPortalInitialTab('content');
-                setShowPortalModal(true);
-              }}
             />
           </div>
         )}
@@ -683,12 +485,6 @@ export default function App() {
       <Footer
         cursorBubbleEnabled={cursorBubbleEnabled}
         onToggleCursorBubble={() => setCursorBubbleEnabled(!cursorBubbleEnabled)}
-        isOwnerLoggedIn={isOwnerLoggedIn}
-        onOpenOwnerPortal={() => {
-          setPortalInitialTab('analytics');
-          setShowPortalModal(true);
-        }}
-        onOpenLoginModal={() => setShowLoginModal(true)}
         onSelectTab={handleSelectTab}
         siteTheme={siteTheme}
         onToggleSiteTheme={handleToggleSiteTheme}
@@ -710,30 +506,6 @@ export default function App() {
       <CertificateLightbox
         certificate={selectedCertificate}
         onClose={() => setSelectedCertificate(null)}
-      />
-
-      {/* Owner Login Dialog */}
-      <OwnerLoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onLoginSuccess={handleLoginSuccess}
-        credentials={portfolio.credentials}
-        onResetPassword={handleResetPassword}
-      />
-
-      {/* Full Owner Portal Modal (Analytics, Content Editor, File Manager, Inbox, Settings) */}
-      <OwnerPortalModal
-        isOpen={showPortalModal}
-        onClose={() => setShowPortalModal(false)}
-        portfolio={portfolio}
-        onUpdatePortfolio={handleUpdatePortfolio}
-        onAddFile={handleAddFile}
-        onDeleteFile={handleDeleteFile}
-        onUpdateCredentials={handleUpdateCredentials}
-        onImportState={handleImportState}
-        onResetDefault={handleResetDefault}
-        onLogout={handleLogout}
-        initialTab={portalInitialTab}
       />
     </div>
   );

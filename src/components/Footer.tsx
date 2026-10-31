@@ -1,12 +1,9 @@
 import React from 'react';
-import { KeyRound, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
 interface FooterProps {
   cursorBubbleEnabled: boolean;
   onToggleCursorBubble: () => void;
-  isOwnerLoggedIn: boolean;
-  onOpenOwnerPortal: () => void;
-  onOpenLoginModal: () => void;
   onSelectTab: (tabId: string) => void;
   siteTheme: 'dark' | 'light';
   onToggleSiteTheme: () => void;
@@ -16,9 +13,6 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({
   cursorBubbleEnabled,
   onToggleCursorBubble,
-  isOwnerLoggedIn,
-  onOpenOwnerPortal,
-  onOpenLoginModal,
   onSelectTab,
   siteTheme,
   onToggleSiteTheme,
@@ -129,25 +123,6 @@ export const Footer: React.FC<FooterProps> = ({
             >
               Cursor: {cursorBubbleEnabled ? 'on' : 'off'}
             </button>
-
-            {/* Owner Access link in footer */}
-            {isOwnerLoggedIn ? (
-              <button
-                onClick={onOpenOwnerPortal}
-                className="flex items-center gap-1.5 text-[#19e05f] hover:underline font-semibold cursor-pointer"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Owner Dashboard</span>
-              </button>
-            ) : (
-              <button
-                onClick={onOpenLoginModal}
-                className="flex items-center gap-1 text-gray-500 hover:text-[#19e05f] transition-colors cursor-pointer"
-              >
-                <KeyRound className="w-3 h-3" />
-                <span>Owner Portal Access</span>
-              </button>
-            )}
           </div>
         </div>
       </div>

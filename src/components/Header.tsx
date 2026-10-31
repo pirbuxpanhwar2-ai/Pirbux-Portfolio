@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { KeyRound, ShieldCheck, Sun, Moon, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Sun, Moon, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   currentLang: 'en' | 'ur';
   onToggleLang: () => void;
-  isOwnerLoggedIn: boolean;
-  onOpenOwnerPortal: () => void;
-  onOpenLoginModal: () => void;
   activeTab: string;
   onSelectTab: (tabId: string) => void;
   siteTheme: 'dark' | 'light';
@@ -16,9 +13,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   currentLang,
   onToggleLang,
-  isOwnerLoggedIn,
-  onOpenOwnerPortal,
-  onOpenLoginModal,
   activeTab,
   onSelectTab,
   siteTheme,
@@ -125,28 +119,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </button>
 
-          {/* Owner Portal / Login Access Button */}
-          {isOwnerLoggedIn ? (
-            <button
-              onClick={onOpenOwnerPortal}
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#19e05f]/20 border border-[#19e05f] text-[#19e05f] hover:bg-[#19e05f] hover:text-[#031007] transition-all shadow-md shadow-[#19e05f22] cursor-pointer"
-              title="Open Owner Management Portal"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Owner Portal</span>
-              <span className="sm:hidden">Portal</span>
-            </button>
-          ) : (
-            <button
-              onClick={onOpenLoginModal}
-              className="flex items-center gap-1.5 text-xs font-medium px-2.5 sm:px-3 py-1.5 rounded-full bg-[#0a1510] border border-[#1d5a35] text-gray-300 hover:border-[#19e05f] hover:text-[#19e05f] transition-all cursor-pointer"
-              title="Owner Login (Pir Bux)"
-            >
-              <KeyRound className="w-3.5 h-3.5 text-[#19e05f]" />
-              <span className="hidden sm:inline">Owner Login</span>
-            </button>
-          )}
-
           {/* Language Toggle (English / Urdu) */}
           <button
             onClick={onToggleLang}
@@ -204,19 +176,6 @@ export const Header: React.FC<HeaderProps> = ({
               {siteTheme === 'light' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
               <span>{siteTheme === 'light' ? 'Switch to Dark Theme' : 'Switch to Light Theme'}</span>
             </button>
-
-            {!isOwnerLoggedIn && (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenLoginModal();
-                }}
-                className="text-xs text-[#19e05f] font-medium flex items-center gap-1"
-              >
-                <KeyRound className="w-3.5 h-3.5" />
-                <span>Owner Login</span>
-              </button>
-            )}
           </div>
         </div>
       )}

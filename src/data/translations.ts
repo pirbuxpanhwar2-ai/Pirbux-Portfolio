@@ -134,8 +134,5 @@ export const URDU_DICTIONARY: Record<string, string> = {
   "Say": "کیا کہتے ہیں",
   "Awards": "ایوارڈز",
   "Office Documents": "آفس دستاویزات",
-  "Me": "رابطہ",
-  "Owner Portal": "اونر پورٹل",
-  "Owner Login": "اونر لاگ اِن",
-  "Logged in as Owner": "بطور اونر لاگ اِن ہیں"
+  "Me": "رابطہ"
 };

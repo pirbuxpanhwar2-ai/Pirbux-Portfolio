@@ -2,7 +2,6 @@ import { PortfolioState, ActivityLogItem } from '../types/portfolio';
 import { initialPortfolioData } from '../data/defaultPortfolio';
 
 const STORAGE_KEY = 'pb_portfolio_state_v1';
-const AUTH_KEY = 'pb_owner_auth_v1';
 
 const SITE_THEME_KEY = 'pb_site_theme_v1';
 
@@ -122,25 +121,7 @@ export function resetPortfolioState(): PortfolioState {
   return initialPortfolioData;
 }
 
-export function loadOwnerAuth(): boolean {
-  try {
-    return localStorage.getItem(AUTH_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
 
-export function saveOwnerAuth(isLoggedIn: boolean): void {
-  try {
-    if (isLoggedIn) {
-      localStorage.setItem(AUTH_KEY, 'true');
-    } else {
-      localStorage.removeItem(AUTH_KEY);
-    }
-  } catch (err) {
-    console.error('Error saving auth to localStorage:', err);
-  }
-}
 
 export function logActivity(
   state: PortfolioState,
